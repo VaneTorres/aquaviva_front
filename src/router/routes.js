@@ -19,7 +19,8 @@ const routes = [{
         children: [{
             path: 'business',
             component: () =>
-                import ('pages/Business.vue')
+                import ('pages/Business.vue'),
+            name: 'business'
         }]
     },
     // Always leave this as last one,

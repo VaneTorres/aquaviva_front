@@ -48,17 +48,17 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { ref } from "vue";
 import "../../css/styleAuth.scss";
-export default defineComponent({
+export default {
   name: "Login",
-  data() {
+  setup() {
     return {
       /*---------------------INICIAR LOS CAMPOS DEL FORMULARIO--------------------*/
-      valid: true,
-      password: "",
-      email: "",
-      isPwd: true,
+      valid: ref(true),
+      password: ref(null),
+      email: ref(null),
+      isPwd: ref(true),
       /*------------------------------------VALIDAR------------------------------*/
       emailRules: [
         (v) => !!v || "El correo electrónico es requerido.",
@@ -76,16 +76,25 @@ export default defineComponent({
       this.$axios
         .post("http://127.0.0.1:8000/api/login", data)
         .then((response) => {
-          console.log(response);
+          
+           this.$router.replace({ path: "/admin/business"})
         })
         .catch((e) => {
           // Capturamos los errores
-          this.$q.notify({
-            message: "Ocurrió un error, inténtelo más tarde.",
-            type: "negative",
-          });
+          if (e.response.data.error == "invalid_credentials") {
+            this.$q.notify({
+              message:
+                "El usuario o la contraseña son incorrectos, intenta de nuevo.",
+              type: "negative",
+            });
+          } else {
+            this.$q.notify({
+              message: "Ocurrió un error, inténtelo más tarde.",
+              type: "negative",
+            });
+          }
         });
     },
   },
-});
+};
 </script>

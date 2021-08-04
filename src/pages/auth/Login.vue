@@ -48,17 +48,17 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { mapActions } from "vuex";
 import "../../css/styleAuth.scss";
 export default {
   name: "Login",
-  setup() {
+  data() {
     return {
       /*---------------------INICIAR LOS CAMPOS DEL FORMULARIO--------------------*/
-      valid: ref(true),
-      password: ref(null),
-      email: ref(null),
-      isPwd: ref(true),
+      valid:true,
+      password:null,
+      email:null,
+      isPwd:true,
       /*------------------------------------VALIDAR------------------------------*/
       emailRules: [
         (v) => !!v || "El correo electrónico es requerido.",
@@ -71,12 +71,13 @@ export default {
     };
   },
   methods: {
+    ...mapActions({
+            Storelogin: "auth/userLogin"
+         }),
     login: function (e) {
       const data = { email: this.email, password: this.password };
-      this.$axios
-        .post("http://127.0.0.1:8000/api/login", data)
+      this.Storelogin(this.data)
         .then((response) => {
-          
            this.$router.replace({ path: "/admin/business"})
         })
         .catch((e) => {
@@ -84,7 +85,7 @@ export default {
           if (e.response.data.error == "invalid_credentials") {
             this.$q.notify({
               message:
-                "El usuario o la contraseña son incorrectos, intenta de nuevo.",
+                "Su correo electrónico o contraseña son incorrectos.",
               type: "negative",
             });
           } else {

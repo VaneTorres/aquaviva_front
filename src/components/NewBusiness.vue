@@ -103,9 +103,10 @@
        </div>
     </q-step>
     <q-step :name="3" title="Administrador" icon="person" :done="step > 2">
+       <div class="row">
       <q-select
         v-model="model"
-        :options="options"
+        :options="options_type_document"
         color="primary"
         label="Tipo de documento"
         class="col-md-6 q-pa-sm"
@@ -138,6 +139,7 @@
         label="Correo electrónico"
         class="col-md-6 q-pa-sm"
       />
+      </div>
     </q-step>
     <template v-slot:navigation>
       <q-stepper-navigation>
@@ -154,7 +156,7 @@
           label="Registrar"
         />
         <q-btn
-          v-if="step > 1"
+          v-if="step > 1 "
           flat
           color="primary"
           @click="$refs.stepper.previous()"
@@ -167,22 +169,25 @@
 </template>
 <script>
 import { useQuasar } from "quasar";
-import { ref } from "vue";
-
-const stringCiiuOptions = [
-  {
-    label: "0111",
-    value: "0111",
-    description:
-      "Agricultura, ganadería, caza y actividades de servicios conexas",
+import { ref,onMounted  } from "vue";
+import axios from 'axios';
+const stringCiiuOptions=[];
+const stringTownOptions = [ {
+    label: "Bogota",
+    value: "1",
   },
   {
-    label: "0112",
-    value: "0112",
-    description: "Cultivos agrícolas transitorios",
+    label: "Manizales",
+    value: "2",
+  },];
+const stringDocumentOptions = [ {
+    label: "Cedula",
+    value: "1",
   },
-];
-const stringTownOptions = [ "Bogotá", "Manizales"];
+  {
+    label: "Tarjeta de extrangeria",
+    value: "2",
+  },];
 export default {
   setup() {
     const $q = useQuasar();
@@ -195,10 +200,12 @@ export default {
     const logo = ref(null);
     const town = ref(null);
     const contect = ref(null);
-    const options_ciiu = ref(stringCiiuOptions);
+    const options_ciiu = ref(null);
     const options_town = ref(stringTownOptions);
+    const options_type_document = ref(stringDocumentOptions);
     /*----------------------------------FILE TYPE------------------------------*/
     function submit() {
+      
        const data = { nit: nit.value, codeCiiu: codeCiiu.value, name:addresName.value,description:description.value, contect:contect.value };
     }
     function checkFileType(files) {
@@ -225,11 +232,32 @@ export default {
       update(() => {
         const needle = val.toLocaleLowerCase();
         options_town.value = stringTownOptions.filter(
-          (v) => v.toLocaleLowerCase().indexOf(needle) > -1
+          (v) => v.value.toLocaleLowerCase().indexOf(needle) > -1
         );
       });
     }
-
+onMounted(() => {
+      axios
+        .get("http://127.0.0.1:8000/api/get_ciiu")
+        .then((response) => {
+          stringCiiuOptions.push(
+            {
+              label: response.data[0].ciiu,
+              value: response.data[0].id,
+              description: response.data[0].description,
+            }
+          );
+          console.log(stringCiiuOptions);
+        })
+        .catch((e) => {
+          // Capturamos los errores
+       
+           $q.notify({
+              message: "Ocurrió un error, inténtelo más tarde.",
+              type: "negative",
+            });
+        });
+    })
     return {
       /*-----------------------------------MODEL-VALUE------------------------------*/
       step: ref(1),
@@ -244,6 +272,7 @@ export default {
       contect,
       options_ciiu,
       options_town,
+      options_type_document,
       /*------------------------------------VALIDATE------------------------------*/
       nitRules: [(v) => !!v || "El NIT es requerido."],
       codeCiiuRule: [(v) => !!v || "El código CIIU es requerido."],
@@ -251,8 +280,8 @@ export default {
       addresNameRules: [(v) => !!v || "El nombre de la sede es requerida."],
       descriptionRules: [(v) => !!v || "La descripción de la sede es requerida."],
       addresRules: [(v) => !!v || "La dirección de la sede es requerida."],
-      phoneRules: [(v) => !!v || "El teléfono de la sede es requerida."],
-      contectRules: [(v) => !!v || "El responsable es requerida."],
+      phoneRules: [(v) => !!v || "El teléfono de la sede es requerido."],
+      contectRules: [(v) => !!v || "El responsable es requerido."],
       /*------------------------------------FUNTIONS------------------------------*/
       checkFileType,
       onRejected,
@@ -261,5 +290,6 @@ export default {
       submit,
     };
   },
+
 };
 </script>

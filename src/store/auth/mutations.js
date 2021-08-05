@@ -1,3 +1,3 @@
-export function userLogin(state, token) {
+export function SET_TOKEN(state, token) {
     state.token = token;
 }

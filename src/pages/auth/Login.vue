@@ -76,9 +76,12 @@ export default {
          }),
     login: function (e) {
       const data = { email: this.email, password: this.password };
-      this.Storelogin(this.data)
+      this.Storelogin(data)
         .then((response) => {
-           this.$router.replace({ path: "/admin/business"})
+          console.log(response)
+          this.$store.commit('auth/SET_TOKEN', response.data.token);
+          console.log(this.$store.state.auth.token);
+           /* this.$router.replace({ path: "/admin/business"}) */
         })
         .catch((e) => {
           // Capturamos los errores

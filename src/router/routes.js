@@ -1,3 +1,5 @@
+import { route } from 'quasar/wrappers'
+import router from '.'
 const routes = [{
         path: '/',
         component: () =>
@@ -5,7 +7,7 @@ const routes = [{
         children: [{
             path: '',
             component: () =>
-                import ('pages/auth/Login.vue')
+                import ('pages/auth/Login.vue'), name:"login"
         }, {
             path: '/forget',
             component: () =>
@@ -21,7 +23,8 @@ const routes = [{
             component: () =>
                 import ('pages/Business.vue'),
             name: 'business'
-        }]
+        }],
+        meta:{requireAuth:true}
     },
     // Always leave this as last one,
     // but you can also remove it
@@ -29,7 +32,8 @@ const routes = [{
         path: '/:catchAll(.*)*',
         component: () =>
             import ('pages/Error404.vue')
-    }
-]
+        }
+    ]
+  
 
 export default routes

@@ -1,113 +1,168 @@
 <template>
-    <q-page>
-      <div class="q-pa-md">
-    <q-table
-      title="Treats"
-      :rows="rows"
-      :columns="columns"
-      row-key="id"
-      :filter="filter"
-      :loading="loading"
-    >
-
-      <template v-slot:top>
-        <q-btn :disable="loading"  round color="primary" icon="add" @click="fixed = true" />
-        <q-space />
-        <q-input outlined  dense debounce="300" color="primary" v-model="filter">
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-      </template>
-
-    </q-table>
-       <q-dialog v-model="fixed">
-         <NewCompany />
-    </q-dialog>
-  </div>
+  <q-page>
+    <div class="q-pa-md">
+      <q-table
+        title="Treats"
+        :rows="rows"
+        :columns="columns"
+        row-key="id"
+        :filter="filter"
+        :loading="loading"
+      >
+        <template v-slot:top>
+          <q-btn
+            :disable="loading"
+            round
+            color="primary"
+            icon="add"
+            @click="fixed = true"
+          />
+          <q-space />
+          <q-input
+            outlined
+            dense
+            debounce="300"
+            color="primary"
+            v-model="filter"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </template>
+        <template v-slot:body-cell-action="props">
+          <q-td :props="props">
+            <q-btn
+              color="primary"
+              icon-right="edit"
+              no-caps
+              flat
+              dense
+              @click="deleteval(data.indexOf(props.row))"
+            />
+            <q-btn
+              color="secondary"
+              icon-right="mdi-eye"
+              no-caps
+              flat
+              dense
+              @click="seeval(props.row.id)"
+            />
+          </q-td>
+        </template>
+      </q-table>
+      <q-dialog v-model="fixed">
+        <NewCompany />
+      </q-dialog>
+    </div>
   </q-page>
 </template>
 
 <script>
-import { ref } from 'vue'
-import NewCompany from 'components/NewBusiness.vue'
-
+import NewCompany from "components/NewBusiness.vue";
 const columns = [
   {
-    name: 'nit',
+    name: "nit",
     required: true,
-    label: 'NIT',
-    align: 'left',
-    field: row => row.name,
-    format: val => `${val}`,
-    sortable: true
+    label: "NIT",
+    align: "center",
+    field: (row) => row.name,
+    format: (val) => `${val}`,
+    sortable: true,
   },
-  { name: 'name_company', align: 'center', label: 'RAZÓN SOCIAL ', field: 'name_company', sortable: true },
-  { name: 'phone', align: 'center', label: 'TELÉFONO', field: 'phone' },
-  { name: 'code_ciiu', align: 'center', label: 'CÓDIGO CIIU ', field: 'code_ciiu', sortable: true },
-  { name: 'decription_ciiu', align: 'center', label: 'DESCRIPCION CIIU', field: 'decription_ciiu', sortable: true },
- 
-]
-
-const originalRows = [
   {
-    name: "830129674 - 0",
-    name_company: "AQUAVIVA GESTION E INGENIERIA S.A.S.",
-    code_ciiu: "0130",
-    decription_ciiu:"Propagación de plantas (actividades de los viveros, excepto viveros forestales)",
-    phone:"3212829956"
+    name: "code_ciiu",
+    align: "center",
+    label: "CÓDIGO CIIU ",
+    field: "code_ciiu",
+    sortable: true,
   },
-  
   {
-     name: "830129674 - 0",
-    name_company: "AQUAVIVA GESTION E INGENIERIA S.A.S.",
-    code_ciiu: "0132",
-    logo:"",
-    decription_ciiu:"Propagación de plantas (actividades de los viveros, excepto viveros forestales)",
-    phone:"3212829956"
+    name: "decription_ciiu",
+    align: "center",
+    label: "DESCRIPCION CIIU",
+    field: "decription_ciiu",
+    sortable: true,
   },
+  { name: "action", label: "Acción", field: "action", align: "center" },
+];
 
-]
+const originalRows = [];
 
 export default {
   components: {
-    NewCompany
+    NewCompany,
   },
-  setup () {
-    
-    const loading = ref(false)
-    const filter = ref('')
-    const rowCount = ref(10)
-    const rows = ref([...originalRows])
-
+  data() {
     return {
-      fixed: ref(false),
+      fixed: false,
       columns,
-      rows,
-      loading,
-      filter,
-      rowCount,
+      rows: originalRows,
+      loading: false,
+      filter: "",
+      rowCount: 10,
+    };
+  },
 
-      // emulate fetching data from server
-      addRow () {
-        loading.value = true
-        setTimeout(() => {
-          const
-            index = Math.floor(Math.random() * (rows.value.length + 1)),
-            row = originalRows[ Math.floor(Math.random() * originalRows.length) ]
+  methods: {
+    seeval(id) {
+      const data={id_company:id};
+      this.$axios
+        .post("http://127.0.0.1:8000/api/company_show", data)
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    addRow() {
+      this.loading = true;
+      this.rows = originalRows;
+      setTimeout(() => {
+        const index = Math.floor(Math.random() * (this.rows.value.length + 1)),
+          row = originalRows[Math.floor(Math.random() * originalRows.length)];
 
-          if (rows.value.length === 0) {
-            rowCount.value = 0
-          }
+        if (this.rows.value.length === 0) {
+          this.rowCount.value = 0;
+        }
 
-          row.id = ++rowCount.value
-          const newRow = { ...row } // extend({}, row, { name: `${row.name} (${row.__count})` })
-          rows.value = [ ...rows.value.slice(0, index), newRow, ...rows.value.slice(index) ]
-          loading.value = false
-        }, 500)
-      },
+        this.row.id = ++this.rowCount.value;
+        const newRow = { ...row }; // extend({}, row, { name: `${row.name} (${row.__count})` })
+        this.rows = [
+          ...this.rows.value.slice(0, index),
+          newRow,
+          ...this.rows.value.slice(index),
+        ];
+        this.loading = false;
+      }, 500);
+    },
+  },
+  created() {
+    this.$axios
+      .get("http://127.0.0.1:8000/api/company_list")
+      .then((response) => {
+        response.data.forEach((element) => {
+          this.rows.push({
+            name: element.nit,
+            logo: element.logo,
+            code_ciiu: element.ciiu,
+            decription_ciiu: element.description,
+            id: element.id_company,
+          });
+        });
+        originalRows = this.rows;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  },
+  beforeCreate() {
+    if (this.$q.localStorage.getItem("redirect") == true) {
+      this.$router.go(0);
+      this.$q.localStorage.set("redirect", false);
     }
-  }
-}
+  },
+};
 </script>
 

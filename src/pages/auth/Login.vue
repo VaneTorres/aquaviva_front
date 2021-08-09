@@ -80,8 +80,13 @@ export default {
         .then((response) => {
           console.log(response)
           this.$store.commit('auth/SET_TOKEN', response.data.token);
-          console.log(this.$store.state.auth.token);
-           /* this.$router.replace({ path: "/admin/business"}) */
+          this.$store.commit('auth/SET_PERMISSIONS', response.data.permissions);
+          this.$q.localStorage.set("redirect", true)
+          this.$q.localStorage.set("TOKEN", response.data.token)
+          this.$q.localStorage.set("PERMISSIONS", response.data.permissions)
+          this.$router.replace({ path: "/admin/business"})
+           /*console.log(this.$store.state.auth.token);
+           this.$router.replace({ path: "/admin/business"}) */
         })
         .catch((e) => {
           // Capturamos los errores

@@ -1,4 +1,5 @@
-/*
-export function someGetter (state) {
-}
-*/
+
+export function authenticated(state){
+    return !!state.token;
+ }
+

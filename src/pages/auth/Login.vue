@@ -84,7 +84,7 @@ export default {
           this.$q.localStorage.set("redirect", true)
           this.$q.localStorage.set("TOKEN", response.data.token)
           this.$q.localStorage.set("PERMISSIONS", response.data.permissions)
-          this.$router.replace({ path: "/admin/business"})
+          this.$router.replace({ path: "/admin/company"})
            /*console.log(this.$store.state.auth.token);
            this.$router.replace({ path: "/admin/business"}) */
         })

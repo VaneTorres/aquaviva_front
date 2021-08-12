@@ -45,6 +45,7 @@
           </template>
         </q-select>
         <q-uploader
+        :factory="factoryFn"
           class="col-md-12 q-pa-sm"
           :filter="checkFileType"
           label="Cargar Logo (Formato png, jpeg)"
@@ -62,8 +63,8 @@
     >
       <div class="row">
         <q-input
-          v-model="addresName"
-          :rules="addresNameRules"
+          v-model="addressName"
+          :rules="addressNameRules"
           type="text"
           class="col-md-6 q-pa-sm"
           label="Nombre"
@@ -87,8 +88,8 @@
           color="primary"
         />
         <q-input
-          v-model="addres"
-          :rules="addresRules"
+          v-model="address"
+          :rules="addressRules"
           type="text"
           class="col-md-6 q-pa-sm"
           label="Dirección"
@@ -101,8 +102,8 @@
           label="Teléfono"
         />
         <q-input
-          v-model="contect"
-          :rules="contectRules"
+          v-model="contact"
+          :rules="contactRules"
           class="col-md-6 q-pa-sm"
           type="text"
           label="Responsable"
@@ -133,8 +134,8 @@
           class="col-md-6 q-pa-sm"
         />
         <q-input
-          v-model="numberCel"
-          :rules="numberCelRules"
+          v-model="mobile"
+          :rules="mobileRules"
           type="text"
           label="Número de celular"
           class="col-md-6 q-pa-sm"
@@ -186,12 +187,13 @@ export default {
       nit: null,
       codeCiiu: null,
       logo: null,
-      addresName: null,
+      addressName: null,
       description: null,
       town: null,
-      addres: null,
+      address: null,
       phone: null,
-      contect: null,
+      mobile: null,
+      contact: null,
       type_document: null,
       numberIdentification: null,
       name: null,
@@ -204,18 +206,18 @@ export default {
       nitRules: [(v) => !!v || "El NIT es requerido."],
       codeCiiuRule: [(v) => !!v || "El código CIIU es requerido."],
       townRule: [(v) => !!v || "El municipio es requerido."],
-      addresNameRules: [(v) => !!v || "El nombre de la sede es requerida."],
+      addressNameRules: [(v) => !!v || "El nombre de la sede es requerida."],
       descriptionRules: [
         (v) => !!v || "La descripción de la sede es requerida.",
       ],
-      addresRules: [(v) => !!v || "La dirección de la sede es requerida."],
+      addressRules: [(v) => !!v || "La dirección de la sede es requerida."],
       phoneRules: [(v) => !!v || "El teléfono de la sede es requerido."],
-      contectRules: [(v) => !!v || "El responsable es requerido."],
+      contactRules: [(v) => !!v || "El responsable es requerido."],
       numberIdentificationRules: [
         (v) => !!v || "El número de identificación es requerido.",
       ],
       nameRules: [(v) => !!v || "Los nombres y apellidos son requeridos."],
-      numberCelRules: [(v) => !!v || "El número de celular es requerido."],
+      mobileRules: [(v) => !!v || "El número de celular es requerido."],
       emailRules: [
         (v) => !!v || "El correo electrónico es requerido.",
         (v) =>
@@ -226,27 +228,40 @@ export default {
     };
   },
   methods: {
+    factoryFn (file) {
+      this.logo=file[0];
+    },
     submit() {
+       const autenticated= this.$q.localStorage.getItem("TOKEN");
       const data = {
-        autenticated: this.$q.localStorage.getItem("TOKEN"),
         nit: this.nit,
         codeCiiu: this.codeCiiu.id,
-        addres: {
-          addresName: this.addresName,
+        logo:this.logo,
+        address: {
+          addressName: this.addressName,
+          address: this.address,
+          phone:this.phone,
+          contact: this.contact,
           description: this.description,
           town: this.town.id,
-          contect: this.contect,
+          type_address:"Principal"
         },
         user: {
           document_type: this.type_document.id,
-          document: this.document,
+          document: this.numberIdentification,
           name: this.name,
-          phone: this.phone,
+          mobile: this.mobile,
           email: this.email,
         },
       };
+      this.$axios.defaults.headers.common["Authorization"] = "Bearer "+autenticated
       this.$axios
         .post("http://127.0.0.1:8000/api/company_creation", data)
+        .then((response) => {
+           const fileData = new FormData()
+      fileData.append('logo ', this.logo)
+      this.$axios
+        .post("http://127.0.0.1:8000/api/save_logo", fileData)
         .then((response) => {
           this.$q.notify({
             type: "positive",
@@ -256,6 +271,11 @@ export default {
         .catch((e) => {
           console.log(e);
         });
+        })
+        .catch((e) => {
+          console.log(e);
+        })
+     
     },
     checkFileType(files) {
       return files.filter(
@@ -314,7 +334,7 @@ export default {
             label: element.ciiu.toString(),
             value: element.ciiu.toString(),
             id: element.id.toString(),
-            description: element.description,
+            description: element.description.toString(),
           });
         });
         stringCiiuOptions = this.options_ciiu;

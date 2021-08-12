@@ -19,9 +19,9 @@ const routes = [{
         component: () =>
             import ('layouts/MainLayout.vue'),
         children: [{
-            path: 'business',
+            path: 'company',
             component: () =>
-                import ('pages/Business.vue'),
+                import ('src/pages/Company.vue'),
             name: 'business'
         }],
         meta:{requireAuth:true}

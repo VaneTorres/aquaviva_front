@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import NewCompany from "components/NewBusiness.vue";
+import NewCompany from "components/NewCompany.vue";
 const columns = [
   {
     name: "nit",
@@ -106,6 +106,7 @@ export default {
 
   methods: {
     seeval(id) {
+      console.log(id);
       const data={id_company:id};
       this.$axios
         .post("http://127.0.0.1:8000/api/company_show", data)

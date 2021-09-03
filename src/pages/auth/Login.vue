@@ -76,9 +76,14 @@ export default {
          }),
     login: function (e) {
       const data = { email: this.email, password: this.password };
-      this.Storelogin(this.data)
+      this.Storelogin(data)
         .then((response) => {
-           this.$router.replace({ path: "/admin/business"})
+          this.$store.commit('auth/SET_TOKEN', response.data.token);
+          this.$store.commit('auth/SET_PERMISSIONS', response.data.permissions);
+          this.$q.localStorage.set("TOKEN", response.data.token);
+          this.$q.localStorage.set("PERMISSIONS", response.data.permissions);
+          this.$q.localStorage.set("USER", response.data.id_user);
+          window.location="/admin/dashboard";
         })
         .catch((e) => {
           // Capturamos los errores

@@ -32,7 +32,7 @@
         </template>
       </q-table>
       <q-dialog v-model="newMonitoring">
-        <NewMonitoring v-on:new="registerMonitoring"/>
+        <NewMonitoring v-on:new="registerMonitoring" />
       </q-dialog>
     </div>
   </q-page>
@@ -96,39 +96,40 @@ export default {
       rowCount: 10,
     };
   },
-  methods:{
+  methods: {
     registerMonitoring(info) {
       console.log(info);
-      this.newMonitoring=false;
+      this.newMonitoring = false;
       this.rows.push({
-            name: info.project,
-            tool: info.tool,
-            authority: info.authority,
-            town: info.town,
-            especification: info.especification,
-          });
+        name: info.project,
+        tool: info.tool,
+        authority: info.authority,
+        town: info.town,
+        especification: info.especification,
+      });
     },
   },
-  
+
   created() {
-    /* this.$axios
-      .get("http://127.0.0.1:8000/api/company_list")
+    var data = {
+      id_user: this.$q.localStorage.getItem("USER"),
+    };
+    this.$axios
+      .post("http://127.0.0.1:8000/api/get_projects", data)
       .then((response) => {
         response.data.forEach((element) => {
           this.rows.push({
-            name: element.nit,
-            logo: element.logo,
-            code_ciiu: element.ciiu,
-            decription_ciiu: element.description,
-            id: element.id_company,
+            name: element.project,
+            tool: element.tool,
+            authority: element.authority,
+            town: element.town,
+            especification: element.especification,
           });
         });
-        originalRows = this.rows;
       })
       .catch((e) => {
         console.log(e);
-      }); */
+      });
   },
 };
 </script>
-

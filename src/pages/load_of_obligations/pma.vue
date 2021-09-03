@@ -32,14 +32,14 @@
         </template>
       </q-table>
       <q-dialog v-model="fixed">
-        <NewMonitoring />
+        <Newpma />
       </q-dialog>
     </div>
   </q-page>
 </template>
 
 <script>
-import NewMonitoring from "src/components/NewMonitoring.vue";
+import Newpma from "src/components/load_of_obligations/Newpma.vue";
 const columns = [
   {
     name: "pma",
@@ -84,7 +84,7 @@ const originalRows = [];
 
 export default {
   components: {
-    NewMonitoring,
+    Newpma,
   },
   data() {
     return {
@@ -118,4 +118,3 @@ export default {
   },
 };
 </script>
-

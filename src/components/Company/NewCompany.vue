@@ -45,8 +45,9 @@
           </template>
         </q-select>
         <q-uploader
-        :factory="factoryFn"
-          class="col-md-12 q-pa-sm"
+          @added="factoryFn"
+          :factory="factoryFn"
+          class="col-md-12 q-pa-sm q-mt-md"
           :filter="checkFileType"
           label="Cargar Logo (Formato png, jpeg)"
           @rejected="onRejected"
@@ -54,7 +55,7 @@
       </div>
     </q-step>
     <!-- Finish Company -->
-    <!-- Start Headquarters  -->
+    <!-- Start Address  -->
     <q-step
       :name="2"
       title="Sede principal"
@@ -110,6 +111,8 @@
         />
       </div>
     </q-step>
+    <!-- Finish Address  -->
+    <!-- Start Admin  -->
     <q-step :name="3" title="Administrador" icon="person" :done="step > 2">
       <div class="row">
         <q-select
@@ -149,6 +152,8 @@
         />
       </div>
     </q-step>
+    <!-- Finish Admin  -->
+    <!-- Button action  -->
     <template v-slot:navigation>
       <q-stepper-navigation>
         <q-btn
@@ -182,7 +187,7 @@ const stringTownOptions = [];
 export default {
   data() {
     return {
-      /*-----------------------------------MODEL-VALUE------------------------------*/
+      //MODEL-VALUE
       step: 1,
       nit: null,
       codeCiiu: null,
@@ -202,7 +207,7 @@ export default {
       options_ciiu: stringCiiuOptions,
       options_town: stringTownOptions,
       options_type_document: [],
-      /*------------------------------------VALIDATE------------------------------*/
+      //VALIDATE
       nitRules: [(v) => !!v || "El NIT es requerido."],
       codeCiiuRule: [(v) => !!v || "El código CIIU es requerido."],
       townRule: [(v) => !!v || "El municipio es requerido."],
@@ -211,13 +216,30 @@ export default {
         (v) => !!v || "La descripción de la sede es requerida.",
       ],
       addressRules: [(v) => !!v || "La dirección de la sede es requerida."],
-      phoneRules: [(v) => !!v || "El teléfono de la sede es requerido."],
-      contactRules: [(v) => !!v || "El responsable es requerido."],
+      phoneRules: [
+        (v) => !!v || "El teléfono de la sede es requerido.",
+        (v) => v.length <= 10 || "El teléfono de la sede debe de ser valido",
+        (v) =>
+          /^[0-9]/.test(v) || "El teléfono de la sede no debe tener letras",
+      ],
+      contactRules: [
+        (v) => !!v || "El responsable es requerido.",
+        (v) => /^[A-Za-z]+$/.test(v) || "El responsable no debe tener números",
+      ],
       numberIdentificationRules: [
         (v) => !!v || "El número de identificación es requerido.",
       ],
-      nameRules: [(v) => !!v || "Los nombres y apellidos son requeridos."],
-      mobileRules: [(v) => !!v || "El número de celular es requerido."],
+      nameRules: [
+        (v) => !!v || "Los nombres y apellidos son requeridos.",
+        (v) =>
+          /^[A-Za-z]+$/.test(v) ||
+          "Los nombres y apellidos no deben tener números",
+      ],
+      mobileRules: [
+        (v) => !!v || "El número de celular es requerido.",
+        (v) => v.length <= 10 || "El número de celular debe de ser valido",
+        (v) => /^[0-9]/.test(v) || "El número de celular no debe tener letras",
+      ],
       emailRules: [
         (v) => !!v || "El correo electrónico es requerido.",
         (v) =>
@@ -228,23 +250,21 @@ export default {
     };
   },
   methods: {
-    factoryFn (file) {
-      this.logo=file[0];
-    },
+    /* Medoto que envia formulario */
     submit() {
-       const autenticated= this.$q.localStorage.getItem("TOKEN");
+      const autenticated = this.$q.localStorage.getItem("TOKEN");
       const data = {
         nit: this.nit,
         codeCiiu: this.codeCiiu.id,
-        logo:this.logo,
+        logo: this.logo,
         address: {
           addressName: this.addressName,
           address: this.address,
-          phone:this.phone,
+          phone: this.phone,
           contact: this.contact,
           description: this.description,
           town: this.town.id,
-          type_address:"Principal"
+          type_address: "Principal",
         },
         user: {
           document_type: this.type_document.id,
@@ -254,29 +274,31 @@ export default {
           email: this.email,
         },
       };
-      this.$axios.defaults.headers.common["Authorization"] = "Bearer "+autenticated
+      this.$axios.defaults.headers.common["Authorization"] =
+        "Bearer " + autenticated;
       this.$axios
         .post("http://127.0.0.1:8000/api/company_creation", data)
         .then((response) => {
-           const fileData = new FormData()
-      fileData.append('logo ', this.logo)
-      this.$axios
-        .post("http://127.0.0.1:8000/api/save_logo", fileData)
-        .then((response) => {
-          this.$q.notify({
-            type: "positive",
-            message: `La empresa se registro con exito`,
-          });
+          const fileData = new FormData();
+          fileData.append("logo ", this.logo);
+          this.$axios
+            .post("http://127.0.0.1:8000/api/save_logo", fileData)
+            .then((response) => {
+              this.$emit("new", data);
+              this.$q.notify({
+                type: "positive",
+                message: `La empresa se registro con exito`,
+              });
+            })
+            .catch((e) => {
+              console.log(e);
+            });
         })
         .catch((e) => {
           console.log(e);
         });
-        })
-        .catch((e) => {
-          console.log(e);
-        })
-     
     },
+    /* Validación de imagen */
     checkFileType(files) {
       return files.filter(
         (file) => file.type === "image/jpeg" || file.type === "image/png"
@@ -288,6 +310,11 @@ export default {
         message: `¡Formato no válido! por favor revise el formato del archivo`,
       });
     },
+    /* Guardar imagen */
+    factoryFn(file) {
+      this.logo = file[0];
+    },
+    /* Flitro en los select */
     filterFn(val, update) {
       if (val === "") {
         update(() => {
@@ -325,19 +352,21 @@ export default {
       });
     },
   },
-  mounted() {
+  created() {
+    /* Consultar datos para los select */
+    this.options_ciiu = [];
     this.$axios
       .get("http://127.0.0.1:8000/api/get_ciiu")
       .then((response) => {
         response.data.forEach((element) => {
-          this.options_ciiu.push({
+          stringCiiuOptions.push({
             label: element.ciiu.toString(),
             value: element.ciiu.toString(),
             id: element.id.toString(),
             description: element.description.toString(),
           });
         });
-        stringCiiuOptions = this.options_ciiu;
+        this.options_ciiu = stringCiiuOptions;
       })
       .catch((e) => {
         console.log(e);
@@ -346,13 +375,12 @@ export default {
       .get("http://127.0.0.1:8000/api/get_towns")
       .then((response) => {
         response.data.forEach((element) => {
-          this.options_town.push({
+          stringTownOptions.push({
             label: element.town.toString(),
             value: element.town,
             id: element.id.toString(),
           });
         });
-        stringTownOptions = this.options_town;
       })
       .catch((e) => {
         console.log(e);

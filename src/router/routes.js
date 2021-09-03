@@ -21,9 +21,40 @@ const routes = [{
         children: [{
             path: 'company',
             component: () =>
-                import ('src/pages/Company.vue'),
-            name: 'business'
-        }],
+                import ('src/pages/company/Company.vue'),
+            name: 'company'
+        },
+        {
+            path: 'dashboard',
+            component: () =>
+                import ('src/pages/dashboard.vue'),
+            name: 'dashboard'
+        },
+        {
+            path: 'mycompany',
+            component: () =>
+                import ('src/pages/company/Mycompany.vue'),
+            name: 'Mycompany'
+        },
+        {
+            path: 'environmental_monitored',
+            component: () =>
+                import ('src/pages/environmental_monitored.vue'),
+            name: 'environmental_monitored'
+        },
+        {
+            path: 'load_of_obligations/pma',
+            component: () =>
+                import ('src/pages/load_of_obligations/pma.vue'),
+            name: 'pma'
+        },
+        {
+            path: 'organizationtree',
+            component: () =>
+                import ('src/pages/organizationtree.vue'),
+            name: 'pma'
+        },
+    ],
         meta:{requireAuth:true}
     },
     // Always leave this as last one,

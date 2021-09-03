@@ -1,6 +1,7 @@
 <template>
   <q-page>
     <div class="q-pa-md">
+      <!-- Tabla de las compañias registradas -->
       <q-table
         title="Treats"
         :rows="rows"
@@ -33,14 +34,6 @@
         <template v-slot:body-cell-action="props">
           <q-td :props="props">
             <q-btn
-              color="primary"
-              icon-right="edit"
-              no-caps
-              flat
-              dense
-              @click="deleteval(data.indexOf(props.row))"
-            />
-            <q-btn
               color="secondary"
               icon-right="mdi-eye"
               no-caps
@@ -51,15 +44,26 @@
           </q-td>
         </template>
       </q-table>
+      <!-- Fin tabla de las compañias registradas -->
+      <!-- Modal nueva compañia -->
       <q-dialog v-model="fixed">
-        <NewCompany />
+        <NewCompany @new="registerCompany" />
       </q-dialog>
+      <!-- Fin modal nueva compañia -->
+      <!-- Modal ver compañia -->
+      <q-dialog v-model="view">
+        <ViewCompany :data="data" />
+      </q-dialog>
+      <!-- Fin modal ver compañia -->
     </div>
   </q-page>
 </template>
 
 <script>
-import NewCompany from "components/NewCompany.vue";
+/* Importar componentes */
+import NewCompany from "src/components/Company/NewCompany.vue";
+import ViewCompany from "src/components/Company/ViewCompany.vue";
+/* Datos de la tabla */
 const columns = [
   {
     name: "nit",
@@ -84,18 +88,23 @@ const columns = [
     field: "decription_ciiu",
     sortable: true,
   },
-  { name: "action", label: "Acción", field: "action", align: "center" },
+  { name: "action", label: "ACCION", field: "action", align: "center" },
 ];
 
 const originalRows = [];
 
 export default {
+  /* Componentes */
   components: {
     NewCompany,
+    ViewCompany,
   },
+  /* Datos */
   data() {
     return {
       fixed: false,
+      view: false,
+      data: [],
       columns,
       rows: originalRows,
       loading: false,
@@ -103,66 +112,61 @@ export default {
       rowCount: 10,
     };
   },
-
   methods: {
+    /* Consulta la compañia */
     seeval(id) {
-      console.log(id);
-      const data={id_company:id};
+      const data = { id_company: id };
       this.$axios
         .post("http://127.0.0.1:8000/api/company_show", data)
         .then((response) => {
-          console.log(response);
+          this.view = true;
+          this.data = [];
+          response.data.forEach((element) => {
+            this.data.push({
+              nit: element.nombre_sede,
+              ciiu: element.ciiu,
+              ciiu_description: element.ciiu_description,
+              nombre_sede: element.nombre_sede,
+              address: element.address,
+              town: element.town,
+              address_description: element.address_description,
+              contact_person: element.contact_person,
+              phone: element.phone,
+            });
+          });
         })
         .catch((e) => {
           console.log(e);
         });
     },
-    addRow() {
-      this.loading = true;
-      this.rows = originalRows;
-      setTimeout(() => {
-        const index = Math.floor(Math.random() * (this.rows.value.length + 1)),
-          row = originalRows[Math.floor(Math.random() * originalRows.length)];
-
-        if (this.rows.value.length === 0) {
-          this.rowCount.value = 0;
-        }
-
-        this.row.id = ++this.rowCount.value;
-        const newRow = { ...row }; // extend({}, row, { name: `${row.name} (${row.__count})` })
-        this.rows = [
-          ...this.rows.value.slice(0, index),
-          newRow,
-          ...this.rows.value.slice(index),
-        ];
-        this.loading = false;
-      }, 500);
+    /* Cierra el modal de la compañia */
+    registerCompany(info) {
+      this.fixed = false;
+      this.listCompany();
+    },
+    /* Tre la lista de las compañias creadas */
+    listCompany() {
+      this.rows = [];
+      this.$axios
+        .get("http://127.0.0.1:8000/api/company_list")
+        .then((response) => {
+          response.data.forEach((element) => {
+            this.rows.push({
+              name: element.nit,
+              logo: element.logo,
+              code_ciiu: element.ciiu,
+              decription_ciiu: element.description,
+              id: element.id_company,
+            });
+          });
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
   },
   created() {
-    this.$axios
-      .get("http://127.0.0.1:8000/api/company_list")
-      .then((response) => {
-        response.data.forEach((element) => {
-          this.rows.push({
-            name: element.nit,
-            logo: element.logo,
-            code_ciiu: element.ciiu,
-            decription_ciiu: element.description,
-            id: element.id_company,
-          });
-        });
-        originalRows = this.rows;
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  },
-  beforeCreate() {
-    if (this.$q.localStorage.getItem("redirect") == true) {
-      this.$router.go(0);
-      this.$q.localStorage.set("redirect", false);
-    }
+    this.listCompany();
   },
 };
 </script>

@@ -1,5 +1,5 @@
 
 export function authenticated(state){
-    return !!state.token;
+    return state.token;
  }
 

@@ -65,7 +65,6 @@
 
 <script>
 import EssentialLink from 'components/EssentialLink.vue'
-import { ref } from 'vue'
 
 export default{
   name: 'MainLayout',
@@ -73,12 +72,7 @@ export default{
   components: {
     EssentialLink
   },
- setup () {
-   const leftDrawerOpen=ref(false)
-    return {
-      leftDrawerOpen,
-    };
-  },
+
 }
 </script>
 <style >

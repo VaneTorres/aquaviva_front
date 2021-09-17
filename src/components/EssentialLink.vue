@@ -23,6 +23,14 @@
       <q-item-label>Mi empresa</q-item-label>
     </q-item-section>
   </q-item>
+  <q-item clickable tag="a" to="/admin/plans">
+    <q-item-section avatar>
+      <q-icon name="business" />
+    </q-item-section>
+    <q-item-section>
+      <q-item-label>Parametrizar planes</q-item-label>
+    </q-item-section>
+  </q-item>
   <q-expansion-item
     class="q-py-sm"
     icon="mdi-clipboard-text-search-outline"
@@ -41,53 +49,27 @@
   </q-expansion-item>
   <q-expansion-item
     class="q-py-sm"
-    icon="mdi-clipboard-text-search-outline"
-    label="Carge de obligaciones"
+    icon="mdi-folder-upload-outline"
+    label="Obligaciones"
   >
     <q-list>
-      <q-item clickable tag="a" to="/admin/load_of_obligations/pma">
+      <q-item clickable tag="a" to="/admin/load_of_obligations">
         <q-item-section avatar>
-          <q-icon name="mdi-clipboard-text-search-outline" />
+          <q-icon name="mdi-folder-upload-outline" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>Fichas PMA</q-item-label>
-        </q-item-section>
-      </q-item>
-      <q-item clickable tag="a" to="/admin/environmental_monitored">
-        <q-item-section avatar>
-          <q-icon name="mdi-clipboard-text-search-outline" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label>Fichas de seguimiento y monitoreo</q-item-label>
-        </q-item-section>
-      </q-item>
-      <q-item clickable tag="a">
-        <q-item-section avatar>
-          <q-icon name="mdi-clipboard-text-search-outline" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label>Permisos y otras autorizaciones</q-item-label>
-        </q-item-section>
-      </q-item>
-      <q-item clickable tag="a">
-        <q-item-section avatar>
-          <q-icon name="mdi-clipboard-text-search-outline" />
-        </q-item-section>
-        <q-item-section>
-          <q-item-label
-            >Actos administrativos de seguimiento ambiental</q-item-label
-          >
+          <q-item-label>Carge de obligaciones manual</q-item-label>
         </q-item-section>
       </q-item>
     </q-list>
   </q-expansion-item>
 
-  <q-item clickable tag="a" to="/admin/organizationtree">
+  <q-item clickable tag="a" to="/admin/departments">
     <q-item-section avatar>
       <q-icon name="mdi-account-network" />
     </q-item-section>
     <q-item-section>
-      <q-item-label>Estructura organizacional</q-item-label>
+      <q-item-label>Departamentos</q-item-label>
     </q-item-section>
   </q-item>
 </template>

@@ -21,6 +21,11 @@ const routes = [
     component: () => import("layouts/MainLayout.vue"),
     children: [
       {
+        path: "profile",
+        component: () => import("src/pages/profile.vue"),
+        name: "profile",
+      },
+      {
         path: "company",
         component: () => import("src/pages/company/Company.vue"),
         name: "company",
@@ -41,14 +46,29 @@ const routes = [
         name: "environmental_monitored",
       },
       {
-        path: "load_of_obligations/pma",
-        component: () => import("src/pages/load_of_obligations/pma.vue"),
+        path: "load_of_obligations",
+        component: () => import("src/pages/load_of_obligations/obligation.vue"),
         name: "pma",
       },
       {
-        path: "organizationtree",
+        path: "departments",
+        component: () => import("src/pages/departments.vue"),
+        name: "departments",
+      },
+      {
+        path: "organization",
         component: () => import("src/pages/organizationtree.vue"),
-        name: "organizationtree",
+        name: "organization",
+      },
+      {
+        path: "plans",
+        component: () => import("src/pages/plans.vue"),
+        name: "plans",
+      },
+      {
+        path: "plansuser",
+        component: () => import("src/pages/viewPlansUser.vue"),
+        name: "plansuser",
       },
     ],
     meta: { requireAuth: true },

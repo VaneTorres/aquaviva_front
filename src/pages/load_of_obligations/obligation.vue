@@ -30,65 +30,86 @@
             </template>
           </q-input>
         </template>
+        <template v-slot:body-cell-action="props">
+          <q-td :props="props">
+            <q-btn
+              color="secondary"
+              icon-right="mdi-eye"
+              no-caps
+              flat
+              dense
+              @click="seeval(1)"
+            />
+          </q-td>
+        </template>
       </q-table>
       <q-dialog v-model="fixed">
-        <Newpma />
+        <NewObligation @new="registerObligation"/>
+      </q-dialog>
+      <q-dialog v-model="view">
+        <ViewObligation :data="data"/>
       </q-dialog>
     </div>
   </q-page>
 </template>
 
 <script>
-import Newpma from "src/components/load_of_obligations/Newpma.vue";
+import NewObligation from "src/components/load_of_obligations/NewObligation.vue";
+import ViewObligation from "src/components/load_of_obligations/ViewObligation.vue";
 const columns = [
   {
-    name: "pma",
+    name: "obligation",
     required: true,
-    label: "NOMBRE DE LA FICHA",
+    label: "OBLIGACIÓN",
     align: "center",
     field: (row) => row.name,
     format: (val) => `${val}`,
     sortable: true,
   },
-  {
-    name: "activity",
+   {
+    name: "code",
     align: "center",
-    label: "ACTIVIDAD",
-    field: "tool",
+    label: "CODIGO",
+    field: "code",
     sortable: true,
   },
   {
-    name: "authority",
+    name: "worksheet",
     align: "center",
-    label: "AUTORIDAD AMBIENTAL",
-    field: "authority",
+    label: "NOMBRE DE LA FICHA",
+    field: "worksheet",
+    sortable: true,
+  },
+  
+  {
+    name: "responsable",
+    align: "center",
+    label: "RESPONSABLE",
+    field: "responsable",
     sortable: true,
   },
   {
-    name: "decription_ciiu",
+    name: "address",
     align: "center",
-    label: "MUNICIPIO",
-    field: "decription_ciiu",
+    label: "SEDE",
+    field: "address",
     sortable: true,
   },
-  {
-    name: "decription_ciiu",
-    align: "center",
-    label: "UBICACIÓN",
-    field: "decription_ciiu",
-    sortable: true,
-  },
+    { name: "action", label: "ACCION", field: "action", align: "center" }
 ];
 
-const originalRows = [];
+const originalRows = [{name:"Plan de manejamiento ambiental",code:"PAM-001",worksheet:"Manejo de aguas residuales",responsable:"John Doe",address:"Coca-Cola-FEMSA"}];
 
 export default {
   components: {
-    Newpma,
+    NewObligation,
+    ViewObligation
   },
   data() {
     return {
+      view: false,
       fixed: false,
+      data: null,
       columns,
       rows: originalRows,
       loading: false,
@@ -96,7 +117,23 @@ export default {
       rowCount: 10,
     };
   },
-
+  methods:{
+    seeval(id) {
+      this.data={ id_company: id,obligation: "Plan de manejamiento ambiental",code:"PAM-001",worksheet:"Manejo de aguas residuales",responsable:"John Doe", address:"Coca-Cola-FEMSA" };
+      this.view=true;
+    },
+    registerObligation(info){
+       this.fixed = false;
+          this.rows.push({
+            name: info.obligation_label,
+            code: info.code,
+            worksheet: info.name,
+            responsable: info.responsable_label,
+            address: info.address_label,
+          });
+        originalRows = this.rows;
+    }
+  },
   created() {
     /* this.$axios
       .get("http://127.0.0.1:8000/api/company_list")

@@ -3,5 +3,7 @@ export default function() {
         token: null,
         permissions: null,
         isRouterAlive: true,
+        idDepartament: null,
+        idAddress:null,
     }
 }

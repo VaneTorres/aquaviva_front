@@ -1,5 +1,5 @@
 <template>
-  <q-card style="width:800px">
+  <q-card style="width: 800px">
     <q-card-section class="row items-center q-pb-none">
       <div class="text-h6">AGREGAR DEPARTAMENTO</div>
       <q-space />
@@ -23,7 +23,7 @@
           />
           <q-select
             use-input
-            :rules="addresRule"
+            :rules="addressRule"
             input-debounce="0"
             @filter="filterAddress"
             v-model="address"
@@ -32,9 +32,8 @@
             class="col-md-6 q-pa-sm"
             color="primary"
           />
-          
         </div>
-        <q-btn type="submit" label="Enviar" form="formDepartament" />
+        <q-btn type="submit" label="Enviar" form="formDepartament" class="q-mt-lg"/>
       </q-form>
     </q-card-section>
   </q-card>
@@ -49,20 +48,32 @@ export default {
   },
   data() {
     return {
-      //MODEL-VALUE
+      valid:true,
+      //V-MODEL
       name: null,
       address: null,
       optionsaddress: stringAddressOptions,
       //VALIDATE
-      nameRules: [(v) => !!v || "El nombre de la sede es requerida."],
+      nameRules: [(v) => !!v || "El nombre del deparamento es requerida."],
+      addressRule: [(v) => !!v || "La sede es requerida."],
     };
   },
   methods: {
-   registerDepartaments(){
-    var data={name: this.name,
-      address:this.address.id,address_label:this.address.label}
-      this.$emit("new", data);
-   },
+    registerDepartaments() {
+      var data = {
+        area: this.name,
+        id_address: this.address.id,
+        name_address: this.address.label,
+      };
+      this.$axios
+      .post("http://127.0.0.1:8000/api/store_area", data)
+      .then((response) => {
+        this.$emit("new", data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    },
     //FILTRO DEL SELECT
     filterAddress(val, update) {
       if (val === "") {
@@ -79,22 +90,23 @@ export default {
       });
     },
   },
-  mounted() {
+  created() {
+    //CONSULTAR LOS MUNICIPIOS
     var data = {
       id_user: this.$q.localStorage.getItem("USER"),
     };
-    //CONSULTAR LOS MUNICIPIOS
     this.$axios
       .post("http://127.0.0.1:8000/api/get_address_by_users", data)
       .then((response) => {
+        this.optionsaddress.length=0;
         response.data.address.forEach((element) => {
-          this.optionsaddress.push({
+          stringAddressOptions.push({
             label: element.name.toString(),
             value: element.name,
             id: element.id_address.toString(),
           });
         });
-        stringAddressOptions = this.optionsaddress;
+        this.optionsaddress=stringAddressOptions;
       })
       .catch((e) => {
         console.log(e);

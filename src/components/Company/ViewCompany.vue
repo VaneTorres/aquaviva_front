@@ -7,7 +7,7 @@
     </q-card-section>
     <q-card-section>
       <div class="row">
-        <div class="col-md-6"><div class="text-subtitle2"> Codigo de Ciiu:</div> {{data[0].ciiu}} </div>
+        <div class="col-md-6"><div class="text-subtitle2">Código de Ciiu:</div> {{data[0].ciiu}} </div>
         <div class="col-md-6"><div class="text-subtitle2">Descripción de Ciiu: </div>{{data[0].ciiu_description}}</div>
       </div>
       <div class="q-pt-md">
@@ -37,7 +37,7 @@ const columns = [
   {
     name: "address",
     align: "center",
-    label: "DIRECCION DE LA SEDE",
+    label: "DIRECCIÓN DE LA SEDE",
     field: "address",
     sortable: true,
   },
@@ -51,7 +51,7 @@ const columns = [
   {
     name: "address_description",
     align: "center",
-    label: "DESCRIPCION DE LA SEDE",
+    label: "DESCRIPCIÓN DE LA SEDE",
     field: "address_description",
     sortable: true,
   },
@@ -65,7 +65,7 @@ const columns = [
   {
     name: "phone",
     align: "center",
-    label: "TELEFONO",
+    label: "TELÉFONO",
     field: "phone",
     sortable: true,
   },

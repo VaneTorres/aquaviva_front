@@ -1,71 +1,111 @@
 <template>
-  <table v-if="treeData.name" class="	q-mx-auto">
-    <tr>
-      <td
-        :colspan="
-          Array.isArray(treeData.children) ? treeData.children.length * 2 : 1
-        "
-        :class="{
-          parentLevel:
-            Array.isArray(treeData.children) && treeData.children.length,
-          extend:
-            Array.isArray(treeData.children) &&
-            treeData.children.length &&
-            treeData.extend,
-        }"
-      >
-        <div :class="{ node: true, hasMate: treeData.mate }">
-          <div
-            class="person"
-            :class="Array.isArray(treeData.class) ? treeData.class : []"
-            @click="$emit('click-node', treeData)"
-          >
-            <q-btn flat icon="add" color="primary">
-              <q-menu auto-close>
-                <q-list style="min-width: 100px">
-                  <q-item clickable @click="newOccupation=true">
-                    <q-item-section>Crear un cargo hijo</q-item-section>
-                  </q-item>
-                  <q-item clickable>
-                    <q-item-section>Editar</q-item-section>
-                  </q-item>
-                </q-list>
-              </q-menu>
-            </q-btn>
-            <div class="avat" @click="showing = true">
-              <img src="../../../public/user.png" />
+  <div v-if="treeData.name">
+    <table class="q-mx-auto">
+      <tr>
+        <td
+          :colspan="
+            Array.isArray(treeData.children) ? treeData.children.length * 2 : 1
+          "
+          :class="{
+            parentLevel:
+              Array.isArray(treeData.children) && treeData.children.length,
+            extend:
+              Array.isArray(treeData.children) &&
+              treeData.children.length &&
+              treeData.extend,
+          }"
+        >
+          <div :class="{ node: true, hasMate: treeData.mate }">
+            <div
+              class="person"
+              :class="Array.isArray(treeData.class) ? treeData.class : []"
+              @click="dataOccupation = treeData"
+            >
+              <q-btn flat icon="add" color="primary">
+                <q-menu auto-close>
+                  <q-list style="min-width: 100px">
+                    <q-item clickable @click="newOccupation = true">
+                      <q-item-section>Crear un cargo hijo</q-item-section>
+                    </q-item>
+                    <q-item clickable>
+                      <q-item-section>Editar</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-btn>
+              <div class="avat" @click="showing = true">
+                <img src="../../../public/user.png" />
+              </div>
+              <div class="occupation">{{ treeData.occupation }}</div>
+              <div class="name">{{ treeData.name }}</div>
             </div>
-            <div class="occupation">{{ treeData.occupation }}</div>
-            <div class="name">{{ treeData.name }}</div>
+            <template
+              v-if="Array.isArray(treeData.mate) && treeData.mate.length"
+            >
+              <div
+                class="person"
+                v-for="(mate, mateIndex) in treeData.mate"
+                :key="treeData.name + mateIndex"
+                :class="Array.isArray(mate.class) ? mate.class : []"
+                @click="dataOccupation = mate"
+              >
+                <q-btn flat icon="add" color="primary">
+                  <q-menu auto-close>
+                    <q-list style="min-width: 100px">
+                      <q-item clickable @click="newOccupation = true">
+                        <q-item-section>Crear un cargo hijo</q-item-section>
+                      </q-item>
+                      <q-item clickable>
+                        <q-item-section>Editar</q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-menu>
+                </q-btn>
+                <div class="avat">
+                  <img src="../../../public/user.png" />
+                </div>
+                <div class="occupation">{{ mate.occupation }}</div>
+                <div class="name">{{ mate.name }}</div>
+              </div>
+            </template>
           </div>
-        </div>
-        <div
-          class="extend_handle"
-          v-if="Array.isArray(treeData.children) && treeData.children.length"
-          @click="toggleExtend(treeData)"
-        ></div>
-      </td>
-    </tr>
-    <tr
-      v-if="
-        Array.isArray(treeData.children) &&
-        treeData.children.length &&
-        treeData.extend
-      "
-    >
-      <td
-        v-for="(children, index) in treeData.children"
-        :key="index"
-        colspan="2"
-        class="childLevel"
+          <div
+            class="extend_handle"
+            v-if="Array.isArray(treeData.children) && treeData.children.length"
+            @click="toggleExtend(treeData)"
+          ></div>
+        </td>
+      </tr>
+      <tr
+        v-if="
+          Array.isArray(treeData.children) &&
+          treeData.children.length &&
+          treeData.extend
+        "
       >
-        <TreeChart :json="children" @click-node="$emit('click-node', $event)" />
-      </td>
-    </tr>
-  </table>
-   <q-dialog v-model="newOccupation">
-        <NewEstructure @new="registerCompany" />
-      </q-dialog>
+        <td
+          v-for="(children, index) in treeData.children"
+          :key="index"
+          colspan="2"
+          class="childLevel"
+        >
+          <TreeChart :json="children" @click-node="dataOccupation = $event" />
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div v-if="treeData.name == null">
+    <q-btn
+      flat
+      label="Crear un nuevo cargo"
+      color="primary"
+      @click="newOccupation = true"
+    >
+    </q-btn>
+  </div>
+  <q-dialog v-model="newOccupation">
+    <NewEstructure @new="registerCompany" :dataOccupation="dataOccupation" />
+  </q-dialog>
 </template>
 
 <script>
@@ -82,6 +122,7 @@ export default {
     return {
       treeData: {},
       newOccupation: false,
+      dataOccupation: null,
     };
   },
   watch: {

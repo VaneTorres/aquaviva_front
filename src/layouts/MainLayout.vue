@@ -17,6 +17,7 @@
             style="width: 100px"
           />
         </q-toolbar-title>
+        <!-- Menu de la derecha -->
         <q-btn round dense flat icon="person">
           <q-menu>
             <q-list style="min-width: 100px">
@@ -39,9 +40,10 @@
             </q-list>
           </q-menu>
         </q-btn>
+        <!-- Fin Menu de la derecha -->
       </q-toolbar>
     </q-header>
-
+    <!-- Menu de la derecha -->
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
@@ -49,6 +51,8 @@
       class="text-white"
       style="
         background-image: url(https://demos.creative-tim.com/vue-material-dashboard/img/sidebar-2.32103624.jpg) !important;
+        background-size: cover;
+        background-position: right;
       "
     >
       <div
@@ -57,15 +61,8 @@
       >
         <div style="height: calc(100% - 117px); padding: 10px">
           <q-toolbar>
-            <q-avatar>
-              <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
-            </q-avatar>
-
             <q-toolbar-title class="text-center">
               <div class="text-subtitle1">BIENVENIDO(A)</div>
-              <!-- <div class="text-subtitle2">{{ this.name }}</div>
-            <div class="text-caption">{{ this.document }}</div> -->
-              <br />
             </q-toolbar-title>
           </q-toolbar>
           <hr />
@@ -77,10 +74,12 @@
         </div>
       </div>
     </q-drawer>
-
+    <!-- FinMenu de la derecha -->
+    <!-- Contanido -->
     <q-page-container>
       <router-view />
     </q-page-container>
+    <!-- Fin de contenido -->
   </q-layout>
 </template>
 
@@ -93,14 +92,20 @@ export default {
   components: {
     EssentialLink,
   },
+  data() {
+    return {
+      leftDrawerOpen: false,
+    };
+  },
 };
 </script>
+
 <style >
 .q-drawer {
   background-size: cover !important;
 }
 .drawer_normal {
-  background-color: rgba(1, 1, 1, 0.75);
+  background-color: rgba(1, 1, 1, 0.56);
 }
 .drawer_dark {
   background-color: #010101f2;

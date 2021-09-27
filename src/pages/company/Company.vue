@@ -3,7 +3,6 @@
     <div class="q-pa-md">
       <!-- Tabla de las compañias registradas -->
       <q-table
-        title="Treats"
         :rows="rows"
         :columns="columns"
         row-key="id"
@@ -109,7 +108,7 @@ export default {
       rows: originalRows,
       loading: false,
       filter: "",
-      rowCount: 10,
+      rowCount: 20,
     };
   },
   methods: {

@@ -52,12 +52,12 @@ const routes = [
       },
       {
         path: "departments",
-        component: () => import("src/pages/departments.vue"),
+        component: () => import("src/pages/structure/departments.vue"),
         name: "departments",
       },
       {
         path: "organization",
-        component: () => import("src/pages/organizationtree.vue"),
+        component: () => import("src/pages/structure/organizationtree.vue"),
         name: "organization",
       },
       {

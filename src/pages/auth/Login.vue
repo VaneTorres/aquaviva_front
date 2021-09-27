@@ -72,14 +72,14 @@ export default {
   },
   methods: {
     ...mapActions({
-            Storelogin: "auth/userLogin"
+            Storelogin: "parameters/userLogin"
          }),
     login: function (e) {
       const data = { email: this.email, password: this.password };
       this.Storelogin(data)
         .then((response) => {
-          this.$store.commit('auth/SET_TOKEN', response.data.token);
-          this.$store.commit('auth/SET_PERMISSIONS', response.data.permissions);
+          this.$store.commit('parameters/SET_TOKEN', response.data.token);
+          this.$store.commit('parameters/SET_PERMISSIONS', response.data.permissions);
           this.$q.localStorage.set("TOKEN", response.data.token);
           this.$q.localStorage.set("PERMISSIONS", response.data.permissions);
           this.$q.localStorage.set("USER", response.data.id_user);

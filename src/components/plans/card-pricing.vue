@@ -16,7 +16,7 @@
           <q-item v-for="item in text" :key="item.item_id">
             <q-item-section avatar>
               <q-icon color="primary" name="check" /> </q-item-section
-            ><q-item-label>{{item.item}}</q-item-label>
+            ><q-item-label class="text-body2">{{item.item}}</q-item-label>
           </q-item>
         </q-list>
       </div>

@@ -62,13 +62,18 @@ const routes = [
       },
       {
         path: "plans",
-        component: () => import("src/pages/plans.vue"),
+        component: () => import("src/pages/plans/plans.vue"),
         name: "plans",
       },
       {
         path: "plansuser",
-        component: () => import("src/pages/viewPlansUser.vue"),
+        component: () => import("src/pages/plans/viewPlansUser.vue"),
         name: "plansuser",
+      },
+      {
+        path: "formatSIG",
+        component: () => import("src/pages/formatSIG.vue"),
+        name: "formatSIG",
       },
     ],
     meta: { requireAuth: true },

@@ -29,16 +29,20 @@
             </template>
           </q-input>
         </template>
-         <template v-slot:body-cell-status="props">
+        <template v-slot:body-cell-status="props">
           <q-td :props="props">
-                        <q-badge :color="props.row.status=='Activo'?'primary':'negative'">{{ props.row.status }}</q-badge>
-
+            <q-badge
+              text-color="black"
+              class="text-caption text-weight-medium"
+              :color="props.row.status == 'Activo' ? 'info' : 'negative'"
+              >{{ props.row.status }}</q-badge
+            >
           </q-td>
         </template>
-         <template v-slot:body-cell-action="props">
+        <template v-slot:body-cell-action="props">
           <q-td :props="props">
-              <q-btn
-              color="secondary"
+            <q-btn
+              color="primary"
               icon-right="mdi-eye"
               no-caps
               flat
@@ -89,18 +93,21 @@ const columns = [
   { name: "action", label: "ACCION", field: "action", align: "center" },
 ];
 
-const originalRows = [{name:"Versión FULL", price:"1000",status:"Activo"}];
+const originalRows = [
+  { name: "Versión FULL", price: "1000", status: "Activo" },
+];
 
 export default {
   components: {
-    newPlans,viewPlans,
+    newPlans,
+    viewPlans,
   },
   data() {
     return {
-      viewPlans:false,
+      viewPlans: false,
       newPlans: false,
       columns,
-      data:null,
+      data: null,
       rows: originalRows,
       loading: false,
       filter: "",
@@ -108,10 +115,17 @@ export default {
     };
   },
   methods: {
-      seeval(id) {
-        this.data={name:"Versión FULL", price:"1000",status:"Activo",numberUser:"5",numberproject:"2",observation:"Solo es un pago de por vida"}
-        this.viewPlans=true;
-        },
+    seeval(id) {
+      this.data = {
+        name: "Versión FULL",
+        price: "1000",
+        status: "Activo",
+        numberUser: "5",
+        numberproject: "2",
+        observation: "Solo es un pago de por vida",
+      };
+      this.viewPlans = true;
+    },
     registerPlans(info) {
       this.newPlans = false;
       this.rows.push({
@@ -120,6 +134,5 @@ export default {
       });
     },
   },
-
 };
 </script>

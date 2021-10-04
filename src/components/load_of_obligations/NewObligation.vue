@@ -53,9 +53,9 @@
           autogrow
         >
         </q-input>
-        
+
         <q-input
-          v-model="Observations"
+          v-model="observations"
           type="textarea"
           class="col-md-12 q-pa-sm"
           label="Observaciones"
@@ -161,7 +161,7 @@
           stack-label
           v-model="finishdate"
         />
-         <q-select
+        <q-select
           use-input
           input-debounce="0"
           v-model="money"
@@ -178,7 +178,7 @@
           fill-mask=" "
           reverse-fill-mask
         ></q-input>
-       
+
         <q-select
           use-input
           input-debounce="0"
@@ -193,6 +193,7 @@
         <q-select
           use-input
           input-debounce="0"
+          multiple
           @filter="filterResponsable"
           v-model="responsable"
           :options="optionsresponsable"
@@ -243,9 +244,9 @@
   </q-stepper>
 </template>
 <script>
-const stringToolOptions = [];
-const stringResponsableOptions = [];
-const stringAddressOptions = [];
+var stringToolOptions = [];
+var stringResponsableOptions = [];
+var stringAddressOptions = [];
 const columnsIndicator = [
   {
     name: "indicatortype",
@@ -323,6 +324,20 @@ const columnsActivity = [
     field: "activityBudget",
     sortable: true,
   },
+  {
+    name: "activitymoney",
+    align: "center",
+    label: "Moneda",
+    field: "activitymoney",
+    sortable: true,
+  },
+  {
+    name: "activityperson",
+    align: "center",
+    label: "Responsable",
+    field: "activityperson",
+    sortable: true,
+  },
 ];
 export default {
   props: {
@@ -343,7 +358,7 @@ export default {
       code: null,
       objetive: null,
       goal: null,
-      Observations: null,
+      observations: null,
       optionsobligation: stringToolOptions,
       optionsAddress: stringAddressOptions,
       optionsresponsable: stringResponsableOptions,
@@ -375,7 +390,7 @@ export default {
       address: null,
       responsable: null,
       rowsActivity: [],
-      optionsmoney: ["COP", "USD"],
+      optionsmoney: [],
       optionseditdate: ["Variable", "Fija"],
       //VALIDATE
       obligationRule: [(v) => !!v || "La obligación es requerida."],
@@ -413,31 +428,41 @@ export default {
           ? this.indicatorfrequency
           : "No aplica",
       });
-      this.indicatortype= null;
-      this.indicator= null;
-      this.indicatorgoal= null;
-      this.indicatorobjetive= null;
-      this.indicatorfrequency= null;
+      this.indicatortype = null;
+      this.indicator = null;
+      this.indicatorgoal = null;
+      this.indicatorobjetive = null;
+      this.indicatorfrequency = null;
       this.loading = false;
     },
     addActivity() {
+      var stringResponsable = "";
+      if (Array.isArray(this.responsable)) {
+        this.responsable.forEach((element) => {
+          stringResponsable += element.label + ", ";
+        });
+      }
       this.loading = true;
       this.rowsActivity.push({
         name: this.activity ? this.activity : "No aplica",
         edit: this.editdate ? this.editdate : "No aplica",
         activityStart: this.startdate ? this.startdate : "No aplica",
-        activityFinish: this.finishdate
-          ? this.finishdate
+        activityFinish: this.finishdate ? this.finishdate : "No aplica",
+        activityBudget: this.budget ? this.budget : "No aplica",
+        activitymoney: this.money != null ? this.money.label : "No aplica",
+        money: this.money ,
+        activityperson: Array.isArray(this.responsable)
+          ? stringResponsable
           : "No aplica",
-        activityBudget: this.budget
-          ? this.budget
-          : "No aplica",
+        responsable:this.responsable
       });
-      this.activity= null;
-      this.editdate= null;
-      this.startdate= null;
-      this.finishdate= null;
-      this.budget= null;
+      this.activity = null;
+      this.editdate = null;
+      this.startdate = null;
+      this.finishdate = null;
+      this.budget = null;
+      this.responsable = null;
+      this.money = null;
       this.loading = false;
     },
     //FILTRO DEL SELECT
@@ -483,55 +508,71 @@ export default {
         );
       });
     },
-      submit(){
-        var data={
-          obligation: this.obligation.id,
-          obligation_label: this.obligation.label,
-          name: this.name,
-          code: this.code,
-          objetive: this.objetive,
-          goal: this.goal,
-          address: this.address.id,
-          address_label: this.address.label,
-          responsable: this.responsable.id,
-          responsable_label: this.responsable.label,
-          observations: this.Observations,
-          activity:this.rowsActivity,
-          indicator:this.rowsIndicator
-        }
-        this.$emit("new", data);
-      },
+    submit() {
+      var data = {
+        obligation: this.obligation.id,
+        obligation_label: this.obligation.label,
+        name: this.name,
+        code: this.code,
+        objetive: this.objetive,
+        target: this.goal,
+        observations: this.observations,
+        activity: this.rowsActivity,
+        indicator: this.rowsIndicator,
+      };
+      
+      console.log(data);
+      /* this.$emit("new", data); */
+    },
   },
   mounted() {
-    var data = {
-      id_user: this.$q.localStorage.getItem("USER"),
-    };
+    this.optionsmoney = [];
+    stringToolOptions = [];
+    stringAddressOptions = [];
     this.$axios
-      .get("http://127.0.0.1:8000/api/get_tools")
+      .get("http://127.0.0.1:8000/api/get_currencies")
       .then((response) => {
         response.data.forEach((element) => {
-          this.optionsobligation.push({
-            label: element.tool.toString(),
-            value: element.tool,
+          this.optionsmoney.push({
+            label: element.currency.toString(),
+            value: element.currency,
             id: element.id.toString(),
           });
         });
-        stringToolOptions = this.optionsobligation;
       })
       .catch((e) => {
         console.log(e);
       });
     this.$axios
+      .get("http://127.0.0.1:8000/api/get_tools")
+      .then((response) => {
+        stringToolOptions = [];
+        response.data.forEach((element) => {
+          stringToolOptions.push({
+            label: element.tool.toString(),
+            value: element.tool,
+            id: element.id.toString(),
+          });
+        });
+        this.optionsobligation = stringToolOptions;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    var data = {
+      id_user: this.$q.localStorage.getItem("USER"),
+    };
+    this.$axios
       .post("http://127.0.0.1:8000/api/get_address_by_users", data)
       .then((response) => {
         response.data.address.forEach((element) => {
-          this.optionsAddress.push({
+          stringAddressOptions.push({
             label: element.name.toString(),
             value: element.name,
             id: element.id_address.toString(),
           });
         });
-        stringAddressOptions = this.optionsAddress;
+        this.optionsAddress = stringAddressOptions;
       })
       .catch((e) => {
         console.log(e);

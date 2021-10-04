@@ -118,6 +118,7 @@
         <q-select
           v-model="type_document"
           :options="options_type_document"
+          :rules="typeDocumentRules"
           color="primary"
           label="Tipo de documento"
           class="col-md-6 q-pa-sm"
@@ -181,8 +182,8 @@
   </q-stepper>
 </template>
 <script>
-const stringCiiuOptions = [];
-const stringTownOptions = [];
+var stringCiiuOptions = [];
+var stringTownOptions = [];
 
 export default {
   data() {
@@ -218,17 +219,21 @@ export default {
       addressRules: [(v) => !!v || "La dirección de la sede es requerida."],
       phoneRules: [
         (v) => !!v || "El teléfono de la sede es requerido.",
-        (v) => v.length <= 10 || "El teléfono de la sede debe de ser valido",
+        (v) => v.length <= 10 || "El teléfono de la sede debe de ser valido.",
         (v) =>
-          /^[0-9]/.test(v) || "El teléfono de la sede no debe tener letras",
+          /^[0-9]/.test(v) || "El teléfono de la sede no debe tener letras.",
       ],
       contactRules: [
         (v) => !!v || "El responsable es requerido.",
-        (v) => /^[A-Za-z]+$/.test(v) || "El responsable no debe tener números",
+        (v) => /^[A-Za-z]+$/.test(v) || "El responsable no debe tener números.",
       ],
       numberIdentificationRules: [
         (v) => !!v || "El número de identificación es requerido.",
       ],
+      typeDocumentRules: [
+        (v) => !!v || "El tipo de documento es requerido.",
+      ],
+
       nameRules: [
         (v) => !!v || "Los nombres y apellidos son requeridos.",
         (v) =>
@@ -237,7 +242,7 @@ export default {
       ],
       mobileRules: [
         (v) => !!v || "El número de celular es requerido.",
-        (v) => v.length <= 10 || "El número de celular debe de ser valido",
+        (v) => v.length <= 10 || "El número de celular debe de ser válido.",
         (v) => /^[0-9]/.test(v) || "El número de celular no debe tener letras",
       ],
       emailRules: [
@@ -355,18 +360,19 @@ export default {
   created() {
     /* Consultar datos para los select */
     this.options_ciiu = [];
+    this.options_town = [];
     this.$axios
       .get("http://127.0.0.1:8000/api/get_ciiu")
       .then((response) => {
         response.data.forEach((element) => {
-          stringCiiuOptions.push({
+          this.options_ciiu.push({
             label: element.ciiu.toString(),
             value: element.ciiu.toString(),
             id: element.id.toString(),
             description: element.description.toString(),
           });
         });
-        this.options_ciiu = stringCiiuOptions;
+         stringCiiuOptions=this.options_ciiu;
       })
       .catch((e) => {
         console.log(e);
@@ -375,12 +381,13 @@ export default {
       .get("http://127.0.0.1:8000/api/get_towns")
       .then((response) => {
         response.data.forEach((element) => {
-          stringTownOptions.push({
+          this.options_town.push({
             label: element.town.toString(),
             value: element.town,
             id: element.id.toString(),
           });
         });
+        stringTownOptions=this.options_town;
       })
       .catch((e) => {
         console.log(e);

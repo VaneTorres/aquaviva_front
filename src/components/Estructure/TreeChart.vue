@@ -17,18 +17,15 @@
         >
           <div :class="{ node: true, hasMate: treeData.mate }">
             <div
-              class="person"
               :class="Array.isArray(treeData.class) ? treeData.class : []"
+              class="person"
               @click="dataOccupation = treeData"
             >
               <q-btn flat icon="add" color="primary">
                 <q-menu auto-close>
                   <q-list style="min-width: 100px">
                     <q-item clickable @click="newOccupation = true">
-                      <q-item-section>Crear un cargo hijo</q-item-section>
-                    </q-item>
-                    <q-item clickable>
-                      <q-item-section>Editar</q-item-section>
+                      <q-item-section>Crear un cargo</q-item-section>
                     </q-item>
                   </q-list>
                 </q-menu>
@@ -49,18 +46,6 @@
                 :class="Array.isArray(mate.class) ? mate.class : []"
                 @click="dataOccupation = mate"
               >
-                <q-btn flat icon="add" color="primary">
-                  <q-menu auto-close>
-                    <q-list style="min-width: 100px">
-                      <q-item clickable @click="newOccupation = true">
-                        <q-item-section>Crear un cargo hijo</q-item-section>
-                      </q-item>
-                      <q-item clickable>
-                        <q-item-section>Editar</q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-menu>
-                </q-btn>
                 <div class="avat">
                   <img src="../../../public/user.png" />
                 </div>
@@ -104,7 +89,7 @@
     </q-btn>
   </div>
   <q-dialog v-model="newOccupation">
-    <NewEstructure @new="registerCompany" :dataOccupation="dataOccupation" />
+    <NewEstructure @new="registerOccupation" :dataOccupation="dataOccupation" />
   </q-dialog>
 </template>
 
@@ -147,9 +132,13 @@ export default {
   },
   methods: {
     toggleExtend: function (treeData) {
+      console.log(treeData)
       treeData.extend = !treeData.extend;
       this.$forceUpdate();
     },
+    registerOccupation(data){
+      this.newOccupation=false;
+    }
   },
 };
 </script>

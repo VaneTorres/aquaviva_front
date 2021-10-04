@@ -19,6 +19,7 @@ export default {
     return {
       landscape: [],
       datatree: {
+        id_father: null,
         id_structure: null,
         occupation: null,
         name: null,
@@ -29,11 +30,23 @@ export default {
     childrenFine(jsonData, val) {
       if (Array.isArray(jsonData.children)) {
         jsonData.children.forEach((c) => {
-          if (val.id_father == c.id_structure) {
+          if ((val.id_father == c.id_structure) & (val.id_mate == null)) {
             if (!Array.isArray(c.children)) {
               c.children = [];
             }
             c.children.push({
+              id_father: val.id_father,
+              id_structure: val.id_structure,
+              occupation: val.employment,
+              name: val.name,
+            });
+          }
+          if (val.id_mate == c.id_structure) {
+            if (!Array.isArray(c.mate)) {
+              c.mate = [];
+            }
+            c.mate.push({
+              id_father: val.id_father,
               id_structure: val.id_structure,
               occupation: val.employment,
               name: val.name,
@@ -43,36 +56,6 @@ export default {
         });
       }
       return jsonData;
-    },
-    mateFine(mateData, val) {
-      console.log(mateData.children);
-      const handler = {
-        get(target, property) {
-          console.log(`Property ${property} has been read.`);
-          return target[property];
-        },
-      };
-
-      const proxyUser = new Proxy(mateData, {});
-      console.log(proxyUser.children.length);
-
-      if (Array.isArray(mateData.children)) {
-        mateData.children.forEach((c) => {
-          console.log(val.id_mate + "=" + c.id_structure);
-          if (val.id_mate == c.id_structure) {
-            if (!Array.isArray(c.mate)) {
-              c.mate = [];
-            }
-            c.mate.push({
-              id_structure: val.id_structure,
-              occupation: val.employment,
-              name: val.name,
-            });
-          }
-          this.mateFine(c, val);
-        });
-      }
-      return mateData;
     },
     insert(value) {
       const newNode = new Tree(value, null);
@@ -84,8 +67,12 @@ export default {
       } else {
         let auxiliar = this.root;
         if (value.id_father != null) {
-          if (value.id_father == auxiliar.value.id_structure) {
+          if (
+            (value.id_father == auxiliar.value.id_structure) &
+            (value.id_mate == null)
+          ) {
             this.datatree.children.push({
+              id_father: value.id_father,
               id_structure: value.id_structure,
               occupation: value.employment,
               name: value.name,
@@ -100,13 +87,11 @@ export default {
               this.datatree.mate = [];
             }
             this.datatree.mate.push({
+              id_father: value.id_father,
               id: value.id_structure,
               occupation: value.employment,
               name: value.name,
             });
-          } else {
-            console.log(this.datatree.children);
-            this.mateFine(this.datatree, value);
           }
         }
       }

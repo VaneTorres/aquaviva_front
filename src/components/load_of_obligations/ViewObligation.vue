@@ -158,6 +158,20 @@ const columnsActivity = [
     field: "activityBudget",
     sortable: true,
   },
+  {
+    name: "activitymoney",
+    align: "center",
+    label: "Moneda",
+    field: "activitymoney",
+    sortable: true,
+  },
+  {
+    name: "activityperson",
+    align: "center",
+    label: "Responsable",
+    field: "activityperson",
+    sortable: true,
+  },
 ];
 export default {
    data() {

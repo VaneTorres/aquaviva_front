@@ -35,7 +35,7 @@
           v-model="code"
           type="text"
           class="col-md-6 q-pa-sm"
-          label="Codigo"
+          label="Código"
         />
         <q-input
           v-model="objetive"
@@ -53,9 +53,9 @@
           autogrow
         >
         </q-input>
-        
+
         <q-input
-          v-model="Observations"
+          v-model="observations"
           type="textarea"
           class="col-md-12 q-pa-sm"
           label="Observaciones"
@@ -69,13 +69,6 @@
     <q-step :name="2" title="Indicadores" icon="business" :done="step > 1">
       <div class="row">
         <q-input
-          v-model="indicatortype"
-          type="textarea"
-          class="col-md-6 q-pa-sm"
-          label="Tipo de indicador"
-          autogrow
-        />
-        <q-input
           v-model="indicator"
           type="textarea"
           class="col-md-6 q-pa-sm"
@@ -83,7 +76,7 @@
           autogrow
         />
         <q-input
-          v-model="indicatorobjetive"
+          v-model="indicatorobjective"
           type="textarea"
           class="col-md-6 q-pa-sm"
           label="Objetivo"
@@ -101,7 +94,7 @@
           input-debounce="0"
           v-model="indicatorfrequency"
           :options="optionsfrequency"
-          label="Freciencia"
+          label="Frecuencia"
           class="col-md-6 q-pa-sm"
           color="primary"
         />
@@ -146,7 +139,8 @@
         <q-input
           formatModel="string"
           format="YYYY-MM-DD"
-          label="Fecha incial"
+          label="Fecha inicial"
+          :rules="dateInitialRules"
           class="col-md-6 q-pa-sm"
           type="date"
           stack-label
@@ -156,12 +150,13 @@
           formatModel="string"
           format="YYYY-MM-DD"
           label="Fecha final"
+          :rules="dateFinalRules"
           class="col-md-6 q-pa-sm"
           type="date"
           stack-label
           v-model="finishdate"
         />
-         <q-select
+        <q-select
           use-input
           input-debounce="0"
           v-model="money"
@@ -174,11 +169,11 @@
           v-model="budget"
           class="col-md-6 q-pa-sm"
           label="Presupuesto"
-          mask="###.###.###"
+          mask="###.##"
           fill-mask=" "
           reverse-fill-mask
         ></q-input>
-       
+
         <q-select
           use-input
           input-debounce="0"
@@ -193,6 +188,7 @@
         <q-select
           use-input
           input-debounce="0"
+          multiple
           @filter="filterResponsable"
           v-model="responsable"
           :options="optionsresponsable"
@@ -243,45 +239,36 @@
   </q-stepper>
 </template>
 <script>
-const stringToolOptions = [];
-const stringResponsableOptions = [];
-const stringAddressOptions = [];
+var stringToolOptions = [];
+var stringResponsableOptions = [];
+var stringAddressOptions = [];
 const columnsIndicator = [
   {
-    name: "indicatortype",
-    required: true,
-    label: "Tipo de indicador",
-    align: "center",
-    field: (row) => row.name,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
-  {
-    name: "indicator",
+    name: "name",
     align: "center",
     label: "Indicador",
-    field: "indicator",
+    field: "name",
     sortable: true,
   },
   {
-    name: "indicatorGoal",
+    name: "target",
     align: "center",
     label: "Meta",
-    field: "indicatorGoal",
+    field: "target",
     sortable: true,
   },
   {
-    name: "indicatorObjetive",
+    name: "objective",
     align: "center",
     label: "Objetivo",
-    field: "indicatorObjetive",
+    field: "objective",
     sortable: true,
   },
   {
-    name: "indicatorfrequency",
+    name: "frequency",
     align: "center",
     label: "Frecuencia",
-    field: "indicatorfrequency",
+    field: "frequency",
     sortable: true,
   },
 ];
@@ -296,34 +283,50 @@ const columnsActivity = [
     sortable: true,
   },
   {
-    name: "edit",
+    name: "type",
     align: "center",
     label: "Fecha editable",
-    field: "edit",
+    field: "type",
     sortable: true,
   },
   {
-    name: "activityStart",
+    name: "initial_date",
     align: "center",
     label: "Fecha inicial",
-    field: "activityStart",
+    field: "initial_date",
     sortable: true,
   },
   {
-    name: "activityFinish",
+    name: "final_date",
     align: "center",
     label: "Fecha final",
-    field: "activityFinish",
+    field: "final_date",
     sortable: true,
   },
   {
-    name: "activityBudget",
+    name: "estimated_budget",
     align: "center",
     label: "Presupuesto",
-    field: "activityBudget",
+    field: "estimated_budget",
+    sortable: true,
+  },
+  {
+    name: "activitymoney",
+    align: "center",
+    label: "Moneda",
+    field: "activitymoney",
+    sortable: true,
+  },
+  {
+    name: "activityperson",
+    align: "center",
+    label: "Responsable",
+    field: "activityperson",
     sortable: true,
   },
 ];
+var f = new Date();
+var today = f.getFullYear() + "-" + (f.getMonth() + 1) + "-" + f.getDate();
 export default {
   props: {
     id_company: {
@@ -343,7 +346,7 @@ export default {
       code: null,
       objetive: null,
       goal: null,
-      Observations: null,
+      observations: null,
       optionsobligation: stringToolOptions,
       optionsAddress: stringAddressOptions,
       optionsresponsable: stringResponsableOptions,
@@ -359,10 +362,9 @@ export default {
         "Anual",
         "Permanente",
       ],
-      indicatortype: null,
       indicator: null,
       indicatorgoal: null,
-      indicatorobjetive: null,
+      indicatorobjective: null,
       indicatorfrequency: null,
       rowsIndicator: [],
       /* model activity */
@@ -375,10 +377,24 @@ export default {
       address: null,
       responsable: null,
       rowsActivity: [],
-      optionsmoney: ["COP", "USD"],
+      optionsmoney: [],
       optionseditdate: ["Variable", "Fija"],
       //VALIDATE
       obligationRule: [(v) => !!v || "La obligación es requerida."],
+      /* dateInitialRules: [
+        (v) =>
+          v < f ||
+          "tiene que ser depues de hoy es requerida." + today + "/" + v + "-",
+      ],
+      dateFinalRules: [
+        (v) =>
+          v < this.startdate ||
+          "tiene que ser depues de hoy es requerida." +
+            this.startdate   +
+            "/" +
+            v +
+            "-",
+      ], */
     };
   },
   methods: {
@@ -403,41 +419,45 @@ export default {
     addIndicator() {
       this.loading = true;
       this.rowsIndicator.push({
-        name: this.indicatortype ? this.indicatortype : "No aplica",
-        indicator: this.indicator ? this.indicator : "No aplica",
-        indicatorGoal: this.indicatorgoal ? this.indicatorgoal : "No aplica",
-        indicatorObjetive: this.indicatorobjetive
-          ? this.indicatorobjetive
-          : "No aplica",
-        indicatorfrequency: this.indicatorfrequency
-          ? this.indicatorfrequency
-          : "No aplica",
+        name: this.indicator ? this.indicator : "",
+        target: this.indicatorgoal ? this.indicatorgoal : "",
+        objective: this.indicatorobjective ? this.indicatorobjective : "",
+        frequency: this.indicatorfrequency ? this.indicatorfrequency : "",
       });
-      this.indicatortype= null;
-      this.indicator= null;
-      this.indicatorgoal= null;
-      this.indicatorobjetive= null;
-      this.indicatorfrequency= null;
+      this.indicator = null;
+      this.indicatorgoal = null;
+      this.indicatorobjective = null;
+      this.indicatorfrequency = null;
       this.loading = false;
     },
     addActivity() {
+      var stringResponsable = "";
+      if (Array.isArray(this.responsable)) {
+        this.responsable.forEach((element) => {
+          stringResponsable += element.label + ", ";
+        });
+      }
       this.loading = true;
       this.rowsActivity.push({
-        name: this.activity ? this.activity : "No aplica",
-        edit: this.editdate ? this.editdate : "No aplica",
-        activityStart: this.startdate ? this.startdate : "No aplica",
-        activityFinish: this.finishdate
-          ? this.finishdate
-          : "No aplica",
-        activityBudget: this.budget
-          ? this.budget
-          : "No aplica",
+        name: this.activity ? this.activity : "",
+        type: this.editdate ? this.editdate : "",
+        initial_date: this.startdate ? this.startdate : "",
+        final_date: this.finishdate ? this.finishdate : "",
+        activitymoney: this.money != null ? this.money.label : "",
+        id_currency: this.money,
+        estimated_budget: this.budget ? this.budget : "",
+        activityperson: Array.isArray(this.responsable)
+          ? stringResponsable
+          : "",
+        user: this.responsable,
       });
-      this.activity= null;
-      this.editdate= null;
-      this.startdate= null;
-      this.finishdate= null;
-      this.budget= null;
+      this.activity = null;
+      this.editdate = null;
+      this.startdate = null;
+      this.finishdate = null;
+      this.budget = null;
+      this.responsable = null;
+      this.money = null;
       this.loading = false;
     },
     //FILTRO DEL SELECT
@@ -483,55 +503,77 @@ export default {
         );
       });
     },
-      submit(){
-        var data={
-          obligation: this.obligation.id,
-          obligation_label: this.obligation.label,
-          name: this.name,
-          code: this.code,
-          objetive: this.objetive,
-          goal: this.goal,
-          address: this.address.id,
-          address_label: this.address.label,
-          responsable: this.responsable.id,
-          responsable_label: this.responsable.label,
-          observations: this.Observations,
-          activity:this.rowsActivity,
-          indicator:this.rowsIndicator
-        }
-        this.$emit("new", data);
-      },
+    submit() {
+      var data = {
+        id_tool: this.obligation.id,
+        tool_label: this.obligation.label,
+        code: this.code,
+        name: this.name,
+        objetive: this.objetive,
+        target: this.goal,
+        observations: this.observations,
+        indicator: this.rowsIndicator,
+        activity: this.rowsActivity,
+      };
+      this.$axios
+        .post("http://127.0.0.1:8000/api/create_worksheets", data)
+        .then((response) => {
+          console.log(data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+      /* this.$emit("new", data); */
+    },
   },
   mounted() {
-    var data = {
-      id_user: this.$q.localStorage.getItem("USER"),
-    };
+    this.optionsmoney = [];
+    stringToolOptions = [];
+    stringAddressOptions = [];
     this.$axios
-      .get("http://127.0.0.1:8000/api/get_tools")
+      .get("http://127.0.0.1:8000/api/get_currencies")
       .then((response) => {
         response.data.forEach((element) => {
-          this.optionsobligation.push({
-            label: element.tool.toString(),
-            value: element.tool,
+          this.optionsmoney.push({
+            label: element.currency.toString(),
+            value: element.currency,
             id: element.id.toString(),
           });
         });
-        stringToolOptions = this.optionsobligation;
       })
       .catch((e) => {
         console.log(e);
       });
     this.$axios
+      .get("http://127.0.0.1:8000/api/get_tools")
+      .then((response) => {
+        stringToolOptions = [];
+        response.data.forEach((element) => {
+          stringToolOptions.push({
+            label: element.tool.toString(),
+            value: element.tool,
+            id: element.id.toString(),
+          });
+        });
+        this.optionsobligation = stringToolOptions;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    var data = {
+      id_user: this.$q.localStorage.getItem("USER"),
+    };
+    this.$axios
       .post("http://127.0.0.1:8000/api/get_address_by_users", data)
       .then((response) => {
         response.data.address.forEach((element) => {
-          this.optionsAddress.push({
+          stringAddressOptions.push({
             label: element.name.toString(),
             value: element.name,
             id: element.id_address.toString(),
           });
         });
-        stringAddressOptions = this.optionsAddress;
+        this.optionsAddress = stringAddressOptions;
       })
       .catch((e) => {
         console.log(e);

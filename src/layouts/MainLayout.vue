@@ -29,7 +29,7 @@
                   <q-item-label>Perfil</q-item-label>
                 </q-item-section>
               </q-item>
-              <q-item clickable tag="a" href="/admin/dashboard">
+              <q-item clickable tag="a" @click="logout">
                 <q-item-section avatar>
                   <q-icon name="mdi-exit-run" />
                 </q-item-section>
@@ -96,6 +96,26 @@ export default {
     return {
       leftDrawerOpen: false,
     };
+  },
+  methods: {
+    logout() {
+      const autenticated = this.$q.localStorage.getItem("TOKEN");
+      this.$axios.defaults.headers.common["Authorization"] =
+        "Bearer " + autenticated;
+      this.$axios
+        .get("http://127.0.0.1:8000/api/logout")
+        .then((response) => {
+          this.$q.notify({
+            type: "positive",
+            message: `Sesión cerrada`,
+          });
+          this.$q.localStorage.clear();
+          this.$router.push({ path: "/" });
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
   },
 };
 </script>

@@ -34,7 +34,7 @@
         <br />
         <q-btn type="submit" label="Entrar" form="formLogin" />
         <br />
-        <a href="/forget">¿Olvidaste la contraseña?</a>
+        <q-item clickable tag="a" to="/forget"><q-item-label>¿Olvidaste la contraseña?</q-item-label></q-item>
       </q-form>
       <div class="drops">
         <div class="drop drop-1"></div>
@@ -48,7 +48,6 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
 import "../../css/styleAuth.scss";
 export default {
   name: "Login",
@@ -65,18 +64,15 @@ export default {
         (v) =>
           !!/^[-\w.%+]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i.test(
             v
-          ) || "El correo electrónico no es valido.",
+          ) || "El correo electrónico no es válido.",
       ],
       passwordRules: [(v) => !!v || "La contraseña es requerida."],
     };
   },
   methods: {
-    ...mapActions({
-            Storelogin: "parameters/userLogin"
-         }),
     login: function (e) {
       const data = { email: this.email, password: this.password };
-      this.Storelogin(data)
+      this.$axios.post("http://127.0.0.1:8000/api/login",data)
         .then((response) => {
           this.$store.commit('parameters/SET_TOKEN', response.data.token);
           this.$store.commit('parameters/SET_PERMISSIONS', response.data.permissions);

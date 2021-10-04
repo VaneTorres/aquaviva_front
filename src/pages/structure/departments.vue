@@ -99,6 +99,7 @@ export default {
     seeval(id_area,id_address) {
       this.$store.commit('parameters/SET_DEPARTAMENT', id_area);
       this.$store.commit('parameters/SET_ADDRESS', id_address);
+      
       this.$router.push({ path: "/admin/organization" });
 
     },

@@ -23,9 +23,17 @@
       <q-item-label>Mi empresa</q-item-label>
     </q-item-section>
   </q-item>
+  <q-item clickable tag="a" to="/admin/plansuser">
+    <q-item-section avatar>
+      <q-icon name="mdi-ballot-outline" />
+    </q-item-section>
+    <q-item-section>
+      <q-item-label>Planes</q-item-label>
+    </q-item-section>
+  </q-item>
   <q-item clickable tag="a" to="/admin/plans">
     <q-item-section avatar>
-      <q-icon name="business" />
+      <q-icon name="mdi-ballot-outline" />
     </q-item-section>
     <q-item-section>
       <q-item-label>Parametrizar planes</q-item-label>
@@ -45,6 +53,14 @@
           <q-item-label>Monitoreo ambiental</q-item-label>
         </q-item-section>
       </q-item>
+      <q-item clickable tag="a" to="/admin/formatSIG">
+        <q-item-section avatar>
+          <q-icon name="mdi-file-multiple-outline" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>Formatos SIG</q-item-label>
+        </q-item-section>
+      </q-item>
     </q-list>
   </q-expansion-item>
   <q-expansion-item
@@ -55,10 +71,18 @@
     <q-list>
       <q-item clickable tag="a" to="/admin/load_of_obligations">
         <q-item-section avatar>
-          <q-icon name="mdi-folder-upload-outline" />
+          <q-icon name="mdi-book-arrow-up-outline" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>Carge de obligaciones manual</q-item-label>
+          <q-item-label>Carga de obligaciones manual</q-item-label>
+        </q-item-section>
+      </q-item>
+      <q-item clickable tag="a" to="/admin/load_of_obligations">
+        <q-item-section avatar>
+          <q-icon name="mdi-file-table-outline" />
+        </q-item-section>
+        <q-item-section>
+          <q-item-label>Carga de Excel</q-item-label>
         </q-item-section>
       </q-item>
     </q-list>
@@ -66,7 +90,7 @@
 
   <q-item clickable tag="a" to="/admin/departments">
     <q-item-section avatar>
-      <q-icon name="mdi-account-network" />
+      <q-icon name="mdi-file-tree-outline" />
     </q-item-section>
     <q-item-section>
       <q-item-label>Departamentos</q-item-label>

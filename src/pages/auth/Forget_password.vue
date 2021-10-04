@@ -19,6 +19,9 @@
         <br />
         <q-btn type="submit" label="Enviar" form="formForget" />
         <br />
+        <q-item clickable tag="a" to="/">
+          <q-item-label>Iniciar sesión</q-item-label>
+        </q-item>
       </q-form>
       <div class="drops">
         <div class="drop drop-1"></div>
@@ -47,7 +50,7 @@ export default defineComponent({
         (v) =>
           !!/^[-\w.%+]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i.test(
             v
-          ) || "El correo electrónico no es valido.",
+          ) || "El correo electrónico no es válido.",
       ],
     };
   },

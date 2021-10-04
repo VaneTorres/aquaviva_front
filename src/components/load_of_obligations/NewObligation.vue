@@ -35,7 +35,7 @@
           v-model="code"
           type="text"
           class="col-md-6 q-pa-sm"
-          label="Codigo"
+          label="Código"
         />
         <q-input
           v-model="objetive"
@@ -69,13 +69,6 @@
     <q-step :name="2" title="Indicadores" icon="business" :done="step > 1">
       <div class="row">
         <q-input
-          v-model="indicatortype"
-          type="textarea"
-          class="col-md-6 q-pa-sm"
-          label="Tipo de indicador"
-          autogrow
-        />
-        <q-input
           v-model="indicator"
           type="textarea"
           class="col-md-6 q-pa-sm"
@@ -83,7 +76,7 @@
           autogrow
         />
         <q-input
-          v-model="indicatorobjetive"
+          v-model="indicatorobjective"
           type="textarea"
           class="col-md-6 q-pa-sm"
           label="Objetivo"
@@ -101,7 +94,7 @@
           input-debounce="0"
           v-model="indicatorfrequency"
           :options="optionsfrequency"
-          label="Freciencia"
+          label="Frecuencia"
           class="col-md-6 q-pa-sm"
           color="primary"
         />
@@ -146,7 +139,8 @@
         <q-input
           formatModel="string"
           format="YYYY-MM-DD"
-          label="Fecha incial"
+          label="Fecha inicial"
+          :rules="dateInitialRules"
           class="col-md-6 q-pa-sm"
           type="date"
           stack-label
@@ -156,6 +150,7 @@
           formatModel="string"
           format="YYYY-MM-DD"
           label="Fecha final"
+          :rules="dateFinalRules"
           class="col-md-6 q-pa-sm"
           type="date"
           stack-label
@@ -174,7 +169,7 @@
           v-model="budget"
           class="col-md-6 q-pa-sm"
           label="Presupuesto"
-          mask="###.###.###"
+          mask="###.##"
           fill-mask=" "
           reverse-fill-mask
         ></q-input>
@@ -249,40 +244,31 @@ var stringResponsableOptions = [];
 var stringAddressOptions = [];
 const columnsIndicator = [
   {
-    name: "indicatortype",
-    required: true,
-    label: "Tipo de indicador",
-    align: "center",
-    field: (row) => row.name,
-    format: (val) => `${val}`,
-    sortable: true,
-  },
-  {
-    name: "indicator",
+    name: "name",
     align: "center",
     label: "Indicador",
-    field: "indicator",
+    field: "name",
     sortable: true,
   },
   {
-    name: "indicatorGoal",
+    name: "target",
     align: "center",
     label: "Meta",
-    field: "indicatorGoal",
+    field: "target",
     sortable: true,
   },
   {
-    name: "indicatorObjetive",
+    name: "objective",
     align: "center",
     label: "Objetivo",
-    field: "indicatorObjetive",
+    field: "objective",
     sortable: true,
   },
   {
-    name: "indicatorfrequency",
+    name: "frequency",
     align: "center",
     label: "Frecuencia",
-    field: "indicatorfrequency",
+    field: "frequency",
     sortable: true,
   },
 ];
@@ -297,31 +283,31 @@ const columnsActivity = [
     sortable: true,
   },
   {
-    name: "edit",
+    name: "type",
     align: "center",
     label: "Fecha editable",
-    field: "edit",
+    field: "type",
     sortable: true,
   },
   {
-    name: "activityStart",
+    name: "initial_date",
     align: "center",
     label: "Fecha inicial",
-    field: "activityStart",
+    field: "initial_date",
     sortable: true,
   },
   {
-    name: "activityFinish",
+    name: "final_date",
     align: "center",
     label: "Fecha final",
-    field: "activityFinish",
+    field: "final_date",
     sortable: true,
   },
   {
-    name: "activityBudget",
+    name: "estimated_budget",
     align: "center",
     label: "Presupuesto",
-    field: "activityBudget",
+    field: "estimated_budget",
     sortable: true,
   },
   {
@@ -339,6 +325,8 @@ const columnsActivity = [
     sortable: true,
   },
 ];
+var f = new Date();
+var today = f.getFullYear() + "-" + (f.getMonth() + 1) + "-" + f.getDate();
 export default {
   props: {
     id_company: {
@@ -374,10 +362,9 @@ export default {
         "Anual",
         "Permanente",
       ],
-      indicatortype: null,
       indicator: null,
       indicatorgoal: null,
-      indicatorobjetive: null,
+      indicatorobjective: null,
       indicatorfrequency: null,
       rowsIndicator: [],
       /* model activity */
@@ -394,6 +381,20 @@ export default {
       optionseditdate: ["Variable", "Fija"],
       //VALIDATE
       obligationRule: [(v) => !!v || "La obligación es requerida."],
+      /* dateInitialRules: [
+        (v) =>
+          v < f ||
+          "tiene que ser depues de hoy es requerida." + today + "/" + v + "-",
+      ],
+      dateFinalRules: [
+        (v) =>
+          v < this.startdate ||
+          "tiene que ser depues de hoy es requerida." +
+            this.startdate   +
+            "/" +
+            v +
+            "-",
+      ], */
     };
   },
   methods: {
@@ -418,20 +419,14 @@ export default {
     addIndicator() {
       this.loading = true;
       this.rowsIndicator.push({
-        name: this.indicatortype ? this.indicatortype : "No aplica",
-        indicator: this.indicator ? this.indicator : "No aplica",
-        indicatorGoal: this.indicatorgoal ? this.indicatorgoal : "No aplica",
-        indicatorObjetive: this.indicatorobjetive
-          ? this.indicatorobjetive
-          : "No aplica",
-        indicatorfrequency: this.indicatorfrequency
-          ? this.indicatorfrequency
-          : "No aplica",
+        name: this.indicator ? this.indicator : "",
+        target: this.indicatorgoal ? this.indicatorgoal : "",
+        objective: this.indicatorobjective ? this.indicatorobjective : "",
+        frequency: this.indicatorfrequency ? this.indicatorfrequency : "",
       });
-      this.indicatortype = null;
       this.indicator = null;
       this.indicatorgoal = null;
-      this.indicatorobjetive = null;
+      this.indicatorobjective = null;
       this.indicatorfrequency = null;
       this.loading = false;
     },
@@ -444,17 +439,17 @@ export default {
       }
       this.loading = true;
       this.rowsActivity.push({
-        name: this.activity ? this.activity : "No aplica",
-        edit: this.editdate ? this.editdate : "No aplica",
-        activityStart: this.startdate ? this.startdate : "No aplica",
-        activityFinish: this.finishdate ? this.finishdate : "No aplica",
-        activityBudget: this.budget ? this.budget : "No aplica",
-        activitymoney: this.money != null ? this.money.label : "No aplica",
-        money: this.money ,
+        name: this.activity ? this.activity : "",
+        type: this.editdate ? this.editdate : "",
+        initial_date: this.startdate ? this.startdate : "",
+        final_date: this.finishdate ? this.finishdate : "",
+        activitymoney: this.money != null ? this.money.label : "",
+        id_currency: this.money,
+        estimated_budget: this.budget ? this.budget : "",
         activityperson: Array.isArray(this.responsable)
           ? stringResponsable
-          : "No aplica",
-        responsable:this.responsable
+          : "",
+        user: this.responsable,
       });
       this.activity = null;
       this.editdate = null;
@@ -510,18 +505,24 @@ export default {
     },
     submit() {
       var data = {
-        obligation: this.obligation.id,
-        obligation_label: this.obligation.label,
-        name: this.name,
+        id_tool: this.obligation.id,
+        tool_label: this.obligation.label,
         code: this.code,
+        name: this.name,
         objetive: this.objetive,
         target: this.goal,
         observations: this.observations,
-        activity: this.rowsActivity,
         indicator: this.rowsIndicator,
+        activity: this.rowsActivity,
       };
-      
-      console.log(data);
+      this.$axios
+        .post("http://127.0.0.1:8000/api/create_worksheets", data)
+        .then((response) => {
+          console.log(data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
       /* this.$emit("new", data); */
     },
   },

@@ -13,7 +13,7 @@
       icon="business"
       :done="step > 1"
     >
-      <div class="row">
+      <div class="row q-col-gutter-sm">
         <q-select
           use-input
           :rules="obligationRule"
@@ -22,25 +22,25 @@
           v-model="obligation"
           :options="optionsobligation"
           label="Obligación"
-          class="col-md-12 q-pa-sm"
+          class="col-md-12 col-12"
           color="primary"
         />
         <q-input
           v-model="name"
           type="text"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           label="Nombre"
         />
         <q-input
           v-model="code"
           type="text"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           label="Código"
         />
         <q-input
           v-model="objetive"
           type="textarea"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           label="Objetivo"
           autogrow
         >
@@ -48,7 +48,7 @@
         <q-input
           v-model="goal"
           type="textarea"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           label="Meta"
           autogrow
         >
@@ -57,7 +57,7 @@
         <q-input
           v-model="observations"
           type="textarea"
-          class="col-md-12 q-pa-sm"
+          class="col-md-12 col-12"
           label="Observaciones"
           autogrow
         >
@@ -67,25 +67,25 @@
     <!-- Fin información general de la ficha -->
     <!-- Indicadores-->
     <q-step :name="2" title="Indicadores" icon="business" :done="step > 1">
-      <div class="row">
+      <div class="row q-col-gutter-md">
         <q-input
           v-model="indicator"
           type="textarea"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           label="Indicador"
           autogrow
         />
         <q-input
           v-model="indicatorobjective"
           type="textarea"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           label="Objetivo"
           autogrow
         />
         <q-input
           v-model="indicatorgoal"
           type="textarea"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           label="Meta"
           autogrow
         />
@@ -95,14 +95,14 @@
           v-model="indicatorfrequency"
           :options="optionsfrequency"
           label="Frecuencia"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           color="primary"
         />
         <q-btn
           flat
           dense
           color="primary"
-          class="col-md-12 q-pa-sm"
+          class="col-md-12 col-12 q-my-md"
           :disable="loading"
           label="Agregar indicador"
           @click="addIndicator"
@@ -119,11 +119,11 @@
     <!-- Fin Indicadores-->
     <!-- Actividades-->
     <q-step :name="3" title="Actividades" icon="business" :done="step > 2">
-      <div class="row">
+      <div class="row q-col-gutter-md">
         <q-input
           v-model="activity"
           type="textarea"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           label="Actividad"
           autogrow
         />
@@ -133,7 +133,7 @@
           v-model="editdate"
           :options="optionseditdate"
           label="Fecha editable"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           color="primary"
         />
         <q-input
@@ -141,7 +141,7 @@
           format="YYYY-MM-DD"
           label="Fecha inicial"
           :rules="dateInitialRules"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           type="date"
           stack-label
           v-model="startdate"
@@ -151,7 +151,7 @@
           format="YYYY-MM-DD"
           label="Fecha final"
           :rules="dateFinalRules"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           type="date"
           stack-label
           v-model="finishdate"
@@ -162,12 +162,12 @@
           v-model="money"
           :options="optionsmoney"
           label="Moneda"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           color="primary"
         />
         <q-input
           v-model="budget"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           label="Presupuesto"
           mask="###.##"
           fill-mask=" "
@@ -182,7 +182,7 @@
           @update:model-value="UserbyAddress"
           :options="optionsAddress"
           label="Sede"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           color="primary"
         />
         <q-select
@@ -193,14 +193,14 @@
           v-model="responsable"
           :options="optionsresponsable"
           label="Responsable"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           color="primary"
         />
         <q-btn
           flat
           dense
           color="primary"
-          class="col-md-12 q-pa-sm"
+          class="col-md-12 col-12 q-my-md"
           :disable="loading"
           label="Agregar actividad"
           @click="addActivity"
@@ -242,6 +242,7 @@
 var stringToolOptions = [];
 var stringResponsableOptions = [];
 var stringAddressOptions = [];
+/* Columnas tabla de indicadores */
 const columnsIndicator = [
   {
     name: "name",
@@ -272,6 +273,7 @@ const columnsIndicator = [
     sortable: true,
   },
 ];
+/* Columnas tabla de actividades */
 const columnsActivity = [
   {
     name: "activity",
@@ -325,14 +327,10 @@ const columnsActivity = [
     sortable: true,
   },
 ];
+/* Fecha actual */
 var f = new Date();
-var today = f.getFullYear() + "-" + (f.getMonth() + 1) + "-" + f.getDate();
+var today = f.getFullYear() + "-" + (f.getMonth() + 1) + "-0" + f.getDate();
 export default {
-  props: {
-    id_company: {
-      type: Number,
-    },
-  },
   data() {
     return {
       //model general
@@ -379,25 +377,22 @@ export default {
       rowsActivity: [],
       optionsmoney: [],
       optionseditdate: ["Variable", "Fija"],
-      //VALIDATE
+      //Validaciones
       obligationRule: [(v) => !!v || "La obligación es requerida."],
-      /* dateInitialRules: [
+      dateInitialRules: [
         (v) =>
-          v < f ||
-          "tiene que ser depues de hoy es requerida." + today + "/" + v + "-",
+          v >= today ||
+          "La fecha final tiene que ser mayor a la fecha actual " + today + ".",
       ],
       dateFinalRules: [
         (v) =>
-          v < this.startdate ||
-          "tiene que ser depues de hoy es requerida." +
-            this.startdate   +
-            "/" +
-            v +
-            "-",
-      ], */
+          v > this.startdate ||
+          "La fecha final tiene que ser mayor de la fecha inicial.",
+      ],
     };
   },
   methods: {
+    /* Consulta los usuarios una vez seleccione la sede */
     UserbyAddress() {
       var data = { id_address: this.address.id };
       this.$axios
@@ -416,13 +411,14 @@ export default {
           console.log(e);
         });
     },
+    /* Agrega el indicador */
     addIndicator() {
       this.loading = true;
       this.rowsIndicator.push({
-        name: this.indicator ? this.indicator : "",
-        target: this.indicatorgoal ? this.indicatorgoal : "",
-        objective: this.indicatorobjective ? this.indicatorobjective : "",
-        frequency: this.indicatorfrequency ? this.indicatorfrequency : "",
+        name: this.indicator ? this.indicator : null,
+        target: this.indicatorgoal ? this.indicatorgoal : null,
+        objective: this.indicatorobjective ? this.indicatorobjective : null,
+        frequency: this.indicatorfrequency ? this.indicatorfrequency : null,
       });
       this.indicator = null;
       this.indicatorgoal = null;
@@ -430,6 +426,7 @@ export default {
       this.indicatorfrequency = null;
       this.loading = false;
     },
+    /* Agrega la acrividad */
     addActivity() {
       var stringResponsable = "";
       if (Array.isArray(this.responsable)) {
@@ -439,13 +436,13 @@ export default {
       }
       this.loading = true;
       this.rowsActivity.push({
-        name: this.activity ? this.activity : "",
-        type: this.editdate ? this.editdate : "",
-        initial_date: this.startdate ? this.startdate : "",
-        final_date: this.finishdate ? this.finishdate : "",
-        activitymoney: this.money != null ? this.money.label : "",
+        name: this.activity ? this.activity : null,
+        type: this.editdate ? this.editdate : null,
+        initial_date: this.startdate ? this.startdate : null,
+        final_date: this.finishdate ? this.finishdate : null,
+        activitymoney: this.money != null ? this.money.label : null,
         id_currency: this.money,
-        estimated_budget: this.budget ? this.budget : "",
+        estimated_budget: this.budget ? this.budget : null,
         activityperson: Array.isArray(this.responsable)
           ? stringResponsable
           : "",
@@ -460,49 +457,47 @@ export default {
       this.money = null;
       this.loading = false;
     },
-    //FILTRO DEL SELECT
+    //Filtros de select
     filterTool(val, update) {
-      if (val === "") {
-        update(() => {
-          this.optionsobligation = stringToolOptions;
-        });
-        return;
-      }
       update(() => {
-        const needle = val.toLowerCase();
-        this.optionsobligation = stringToolOptions.filter(
-          (v) => v.value.toLowerCase().indexOf(needle) > -1
+        this.optionsobligation = this.filter(
+          val,
+          this.optionsobligation,
+          stringToolOptions
         );
       });
     },
     filterAddress(val, update) {
-      if (val === "") {
-        update(() => {
-          this.optionsAddress = stringAddressOptions;
-        });
-        return;
-      }
       update(() => {
-        const needle = val.toLowerCase();
-        this.optionsAddress = stringAddressOptions.filter(
-          (v) => v.value.toLowerCase().indexOf(needle) > -1
+        this.optionsAddress = this.filter(
+          val,
+          this.optionsAddress,
+          stringAddressOptions
         );
       });
     },
     filterResponsable(val, update) {
-      if (val === "") {
-        update(() => {
-          this.optionsresponsable = stringResponsableOptions;
-        });
-        return;
-      }
       update(() => {
-        const needle = val.toLowerCase();
-        this.optionsresponsable = stringResponsableOptions.filter(
-          (v) => v.value.toLowerCase().indexOf(needle) > -1
+        this.optionsresponsable = this.filter(
+          val,
+          this.optionsresponsable,
+          stringResponsableOptions
         );
       });
     },
+    filter(val, options, stringOptions) {
+      var options_data = options;
+      if (val === "") {
+        options_data = stringOptions;
+      } else {
+        const needle = val.toLowerCase();
+        options_data = stringOptions.filter(
+          (v) => v.value.toLowerCase().indexOf(needle) > -1
+        );
+      }
+      return options_data;
+    },
+    /* Registrar oblicación */
     submit() {
       var data = {
         id_tool: this.obligation.id,
@@ -518,7 +513,11 @@ export default {
       this.$axios
         .post("http://127.0.0.1:8000/api/create_worksheets", data)
         .then((response) => {
-          console.log(data);
+          this.$q.notify({
+            message: this.obligation.label + "Se ha registrado con exito.",
+            type: "negative",
+          });
+          this.$emit("new", data);
         })
         .catch((e) => {
           console.log(e);
@@ -526,10 +525,12 @@ export default {
       /* this.$emit("new", data); */
     },
   },
-  mounted() {
+  created() {
+    /* Vaciar los select del componente*/
     this.optionsmoney = [];
     stringToolOptions = [];
     stringAddressOptions = [];
+    /*Trae las monedas registradas*/
     this.$axios
       .get("http://127.0.0.1:8000/api/get_currencies")
       .then((response) => {
@@ -544,10 +545,10 @@ export default {
       .catch((e) => {
         console.log(e);
       });
+    /*Trae las obligaciones*/
     this.$axios
       .get("http://127.0.0.1:8000/api/get_tools")
       .then((response) => {
-        stringToolOptions = [];
         response.data.forEach((element) => {
           stringToolOptions.push({
             label: element.tool.toString(),
@@ -560,6 +561,7 @@ export default {
       .catch((e) => {
         console.log(e);
       });
+    /*Trae las sedes del usuario logueado*/
     var data = {
       id_user: this.$q.localStorage.getItem("USER"),
     };

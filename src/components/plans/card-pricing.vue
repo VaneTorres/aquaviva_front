@@ -11,12 +11,15 @@
       </div>
     </q-card-section>
     <q-card-section>
-      <div class="text-h6 text-center">
+      <div>
         <q-list>
           <q-item v-for="item in text" :key="item.item_id">
             <q-item-section avatar>
-              <q-icon color="primary" name="check" /> </q-item-section
-            ><q-item-label class="text-body2">{{item.item}}</q-item-label>
+              <q-icon color="primary" name="check" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label class="text-body2">{{ item.item }}</q-item-label>
+            </q-item-section>
           </q-item>
         </q-list>
       </div>
@@ -31,7 +34,7 @@
 import { defineComponent } from "vue";
 export default defineComponent({
   name: "CardPricing",
-  props: {title:String,price:String, text:Array},
+  props: { title: String, price: String, text: Array },
 });
 </script>
 

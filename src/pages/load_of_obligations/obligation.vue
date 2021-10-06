@@ -155,19 +155,14 @@ export default {
     };
     this.axiosAction("http://127.0.0.1:8000/api/get_worksheets", data)
       .then((response) => {
-        if (response.data.status === "Token is Invalid") {
-          console.log("this.logout");
-          this.logout();
-        } else {
-          response.data.address.forEach((element) => {
-            stringAddressOptions.push({
-              label: element.name.toString(),
-              value: element.name,
-              id: element.id_address.toString(),
-            });
+        response.data.address.forEach((element) => {
+          stringAddressOptions.push({
+            label: element.name.toString(),
+            value: element.name,
+            id: element.id_address.toString(),
           });
-          this.optionsAddress = stringAddressOptions;
-        }
+        });
+        this.optionsAddress = stringAddressOptions;
       })
       .catch((e) => {
         console.log(e);

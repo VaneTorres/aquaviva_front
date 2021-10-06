@@ -1,9 +1,9 @@
 <template>
   <q-page>
-    <section class="q-pa-md">
-      <div class="row q-col-gutter-sm q-px-sm">
+    <section>
+      <div class="row q-col-gutter-sm">
         <div
-          class="col-lg-3 col-md-3 col-xs-12 col-sm-12"
+          class="col-lg-4 col-md-4 col-xs-12 col-sm-12"
           v-for="pricing_item in pricing_data"
           :key="pricing_item.id"
         >
@@ -40,6 +40,22 @@ const pricing_data = [
   },
   {
     id: 2,
+    title: "Full",
+    price: "$1000",
+    icon: "home_work",
+    background_image: "linear-gradient(to right, #ed6ea0 0%, #ec8c69 100%)",
+    text: [
+      { item_id: 1, item: "Usuarios ilimitado." },
+      { item_id: 2, item: "Hasta 5 proyectos." },
+      { item_id: 3, item: "240 GB  de almacenamiento." },
+      { item_id: 4, item: "Modulo PMA." },
+      { item_id: 5, item: "Modulo seguimiento monitoreo." },
+      { item_id: 6, item: "Modulo actos administrativos." },
+      { item_id: 7, item: "Modulo matriz de requisitos legales." },
+    ],
+  },
+  {
+    id: 3,
     title: "Full",
     price: "$1000",
     icon: "home_work",

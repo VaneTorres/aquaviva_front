@@ -2,7 +2,6 @@
   <q-page>
     <div class="q-pa-md">
       <q-table
-        title="Treats"
         :rows="rows"
         :columns="columns"
         row-key="id"
@@ -38,24 +37,29 @@
               no-caps
               flat
               dense
-              @click="seeval(1)"
-            />
+              @click="seeval(props.row.id)"
+            >
+              <q-tooltip> Ver detalles </q-tooltip>
+            </q-btn>
           </q-td>
         </template>
       </q-table>
       <q-dialog v-model="fixed">
-        <NewObligation @new="registerObligation"/>
+        <NewObligation @new="registerObligation" />
       </q-dialog>
       <q-dialog v-model="view">
-        <ViewObligation :data="data"/>
+        <ViewObligation :data="data" />
       </q-dialog>
     </div>
   </q-page>
 </template>
 
 <script>
+/* Componentes de ver y nuevo */
 import NewObligation from "src/components/load_of_obligations/NewObligation.vue";
 import ViewObligation from "src/components/load_of_obligations/ViewObligation.vue";
+import { mapActions } from "vuex";
+/* Columnas de las tablas */
 const columns = [
   {
     name: "obligation",
@@ -66,7 +70,7 @@ const columns = [
     format: (val) => `${val}`,
     sortable: true,
   },
-   {
+  {
     name: "code",
     align: "center",
     label: "CODIGO",
@@ -80,7 +84,7 @@ const columns = [
     field: "worksheet",
     sortable: true,
   },
-  
+
   {
     name: "responsable",
     align: "center",
@@ -95,15 +99,15 @@ const columns = [
     field: "address",
     sortable: true,
   },
-    { name: "action", label: "ACCION", field: "action", align: "center" }
+  { name: "action", label: "ACCION", field: "action", align: "center" },
 ];
 
-const originalRows = [{name:"Plan de manejamiento ambiental",code:"PAM-001",worksheet:"Manejo de aguas residuales",responsable:"John Doe",address:"Coca-Cola-FEMSA"}];
+const originalRows = [];
 
 export default {
   components: {
     NewObligation,
-    ViewObligation
+    ViewObligation,
   },
   data() {
     return {
@@ -117,41 +121,57 @@ export default {
       rowCount: 10,
     };
   },
-  methods:{
+  methods: {
+    ...mapActions({
+      axiosAction: "parameters/autenticatedAxios",
+      logout: "parameters/logout",
+    }),
     seeval(id) {
-      this.data={ id_company: id,obligation: "Plan de manejamiento ambiental",code:"PAM-001",worksheet:"Manejo de aguas residuales",responsable:"John Doe", address:"Coca-Cola-FEMSA" };
-      this.view=true;
+      this.data = {
+        id_company: id,
+        obligation: "Plan de manejamiento ambiental",
+        code: "PAM-001",
+        worksheet: "Manejo de aguas residuales",
+        responsable: "John Doe",
+        address: "Coca-Cola-FEMSA",
+      };
+      this.view = true;
     },
-    registerObligation(info){
-       this.fixed = false;
-          this.rows.push({
-            name: info.obligation_label,
-            code: info.code,
-            worksheet: info.name,
-            responsable: info.responsable_label,
-            address: info.address_label,
-          });
-        originalRows = this.rows;
-    }
+    registerObligation(info) {
+      this.fixed = false;
+      this.rows.push({
+        name: info.obligation_label,
+        code: info.code,
+        worksheet: info.name,
+        responsable: info.responsable_label,
+        address: info.address_label,
+      });
+      originalRows = this.rows;
+    },
   },
-  created() {
-    /* this.$axios
-      .get("http://127.0.0.1:8000/api/company_list")
+  mounted() {
+    var data = {
+      id_user: this.$q.localStorage.getItem("USER"),
+    };
+    this.axiosAction("http://127.0.0.1:8000/api/get_worksheets", data)
       .then((response) => {
-        response.data.forEach((element) => {
-          this.rows.push({
-            name: element.nit,
-            logo: element.logo,
-            code_ciiu: element.ciiu,
-            decription_ciiu: element.description,
-            id: element.id_company,
+        if (response.data.status === "Token is Invalid") {
+          console.log("this.logout");
+          this.logout();
+        } else {
+          response.data.address.forEach((element) => {
+            stringAddressOptions.push({
+              label: element.name.toString(),
+              value: element.name,
+              id: element.id_address.toString(),
+            });
           });
-        });
-        originalRows = this.rows;
+          this.optionsAddress = stringAddressOptions;
+        }
       })
       .catch((e) => {
         console.log(e);
-      }); */
+      });
   },
 };
 </script>

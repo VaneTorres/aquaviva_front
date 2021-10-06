@@ -13,12 +13,12 @@
         class="text-center"
         @submit.prevent="registerDepartaments"
       >
-        <div class="row">
+        <div class="row q-col-gutter-sm">
           <q-input
             v-model="name"
             :rules="nameRules"
             type="text"
-            class="col-md-6 q-pa-sm"
+            class="col-md-6 col-12"
             label="Nombre del depatamento"
           />
           <q-select
@@ -29,11 +29,17 @@
             v-model="address"
             :options="optionsaddress"
             label="Sede"
-            class="col-md-6 q-pa-sm"
+            class="col-md-6 col-12"
             color="primary"
           />
         </div>
-        <q-btn type="submit" label="Enviar" form="formDepartament" class="q-mt-lg"/>
+        <q-btn
+          type="submit"
+          color="primary"
+          label="Enviar"
+          form="formDepartament"
+          class="q-mt-lg"
+        />
       </q-form>
     </q-card-section>
   </q-card>
@@ -48,7 +54,7 @@ export default {
   },
   data() {
     return {
-      valid:true,
+      valid: true,
       //V-MODEL
       name: null,
       address: null,
@@ -66,13 +72,13 @@ export default {
         name_address: this.address.label,
       };
       this.$axios
-      .post("http://127.0.0.1:8000/api/store_area", data)
-      .then((response) => {
-        this.$emit("new", data);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+        .post("http://127.0.0.1:8000/api/store_area", data)
+        .then((response) => {
+          this.$emit("new", data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     },
     //FILTRO DEL SELECT
     filterAddress(val, update) {
@@ -98,7 +104,7 @@ export default {
     this.$axios
       .post("http://127.0.0.1:8000/api/get_address_by_users", data)
       .then((response) => {
-        this.optionsaddress.length=0;
+        this.optionsaddress.length = 0;
         response.data.address.forEach((element) => {
           stringAddressOptions.push({
             label: element.name.toString(),
@@ -106,7 +112,7 @@ export default {
             id: element.id_address.toString(),
           });
         });
-        this.optionsaddress=stringAddressOptions;
+        this.optionsaddress = stringAddressOptions;
       })
       .catch((e) => {
         console.log(e);

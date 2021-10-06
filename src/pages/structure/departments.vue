@@ -32,19 +32,25 @@
         <template v-slot:body-cell-action="props">
           <q-td :props="props">
             <q-btn
+              color="secondary"
+              icon-right="mdi-book-open-page-variant-outline"
+              no-caps
               flat
               dense
-              color="secondary"
-              label="Ver estructura organizacional"
-              @click="seeval(props.row.id,props.row.id_address)"
-            ></q-btn>
+              @click="seeval(props.row.id, props.row.id_address)"
+            >
+              <q-tooltip>Ver tareas </q-tooltip>
+            </q-btn>
             <q-btn
+              color="secondary"
+              icon-right="mdi-lan"
+              no-caps
               flat
               dense
-              color="secondary"
-              label="Ver tareas"
-              @click="seeval(props.row.id)"
-            ></q-btn>
+              @click="seeval(props.row.id, props.row.id_address)"
+            >
+              <q-tooltip>Ver estructura organizacional</q-tooltip>
+            </q-btn>
           </q-td>
         </template>
       </q-table>
@@ -96,41 +102,40 @@ export default {
   },
   methods: {
     /* Muestra estructura organizacional */
-    seeval(id_area,id_address) {
-      this.$store.commit('parameters/SET_DEPARTAMENT', id_area);
-      this.$store.commit('parameters/SET_ADDRESS', id_address);
-      
-      this.$router.push({ path: "/admin/organization" });
+    seeval(id_area, id_address) {
+      this.$store.commit("parameters/SET_DEPARTAMENT", id_area);
+      this.$store.commit("parameters/SET_ADDRESS", id_address);
 
+      this.$router.push({ path: "/admin/organization" });
     },
     /* Fin muestra estructura organizacional */
     registerDepartaments(info) {
       this.newDepartments = false;
-      this.departaments()
+      this.departaments();
     },
-    departaments(){
+    departaments() {
       this.rows = [];
-    /*Treaer los departamentos*/
-    var data = { id_user: this.$q.localStorage.getItem("USER") };
-    this.$axios
-      .post("http://127.0.0.1:8000/api/get_areas", data)
-      .then((response) => {
-        response.data.forEach((element) => {
-          this.rows.push({
-            id:element.id_area,
-            name: element.area,
-            address: element.name_address,
-            id_address: element.id_address,
-      });
+      /*Treaer los departamentos*/
+      var data = { id_user: this.$q.localStorage.getItem("USER") };
+      this.$axios
+        .post("http://127.0.0.1:8000/api/get_areas", data)
+        .then((response) => {
+          response.data.forEach((element) => {
+            this.rows.push({
+              id: element.id_area,
+              name: element.area,
+              address: element.name_address,
+              id_address: element.id_address,
+            });
+          });
+        })
+        .catch((e) => {
+          console.log(e);
         });
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-    }
+    },
   },
   mounted() {
-     this.departaments()
+    this.departaments();
   },
 };
 </script>

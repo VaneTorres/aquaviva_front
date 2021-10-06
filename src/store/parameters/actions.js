@@ -1,5 +1,6 @@
 import axios from "axios";
-import { LocalStorage,Notify,router } from 'quasar'
+import { LocalStorage, Notify } from "quasar";
+import router from ".";
 export function userLogin(credentials) {
   return axios.post("http://127.0.0.1:8000/api/login", credentials);
 }
@@ -15,7 +16,7 @@ export function logout(state) {
   axios
     .get("http://127.0.0.1:8000/api/logout")
     .then((response) => {
-        Notify.create({
+      Notify.create({
         type: "positive",
         message: `Sesión cerrada`,
       });

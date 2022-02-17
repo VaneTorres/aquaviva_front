@@ -23,7 +23,7 @@
          <q-select
           use-input
           input-debounce="0"
-          v-model="estatus"
+          v-model="status"
           :options="optionsestatus"
           label="Estado"
           class="col-md-6 q-pa-sm"
@@ -33,13 +33,13 @@
           v-model="numberUser"
           type="number"
           class="col-md-6 q-pa-sm"
-          label="Numero de usuarios"
+          label="Número de usuarios"
         />
         <q-input
-          v-model="numberUser"
+          v-model="numberProject"
           type="number"
           class="col-md-6 q-pa-sm"
-          label="Numero de proyectos"
+          label="Número de proyectos"
         />
          <q-input
           v-model="price"
@@ -64,10 +64,10 @@
     <q-step :name="2" title="Permisos" icon="business" :done="step > 1">
       <div class="row">
            <q-checkbox v-model="check_PMA" label="PMA"   class="col-md-6 q-pa-sm"/>
-           <q-checkbox v-model="check_monitoring" label="Segimiento y monitoreo"  class="col-md-6 q-pa-sm"/>
+           <q-checkbox v-model="check_monitoring" label="Seguimiento y monitoreo"  class="col-md-6 q-pa-sm"/>
            <q-checkbox v-model="check_autority" label="Autoridades ambientales"  class="col-md-6 q-pa-sm"/>
            <q-checkbox v-model="check_admin" label="Actos administrativos"  class="col-md-6 q-pa-sm"/>
-           <q-checkbox v-model="check_matrix" label="Modulo de matriz de requisitos legales"  class="col-md-6 q-pa-sm"/>
+           <q-checkbox v-model="check_matrix" label="Módulo de matriz de requisitos legales"  class="col-md-6 q-pa-sm"/>
            <q-checkbox v-model="check_investment" label="Inversión de no menos de 1%"  class="col-md-6 q-pa-sm"/>
            <q-checkbox v-model="check_risk" label="Gestión de riesgo"  class="col-md-6 q-pa-sm"/>
       </div>
@@ -117,6 +117,7 @@ export default {
       //model general
       name: null,
       numberUser: null,
+      numberProject: null,
       price:null,
       status:null,
       optionsestatus:["Activo","Inactivo"],
@@ -130,5 +131,13 @@ export default {
       check_risk:false,
     };
   },
+  methods:{
+    submit(){
+      this.$emit("new");
+      this.$q.notify({
+                type: "positive",
+                message: `El plan se registro con exito`,
+              });
+}  }
 };
 </script>

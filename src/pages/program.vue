@@ -64,7 +64,7 @@ const columns = [
   {
     name: "obligation",
     required: true,
-    label: "OBLIGACIÓN",
+    label: "CODIGO",
     align: "center",
     field: (row) => row.name,
     format: (val) => `${val}`,
@@ -73,32 +73,11 @@ const columns = [
   {
     name: "code",
     align: "center",
-    label: "CODIGO",
+    label: "NOMBRE",
     field: "code",
     sortable: true,
   },
-  {
-    name: "worksheet",
-    align: "center",
-    label: "NOMBRE DE LA FICHA",
-    field: "worksheet",
-    sortable: true,
-  },
-
-  {
-    name: "responsable",
-    align: "center",
-    label: "RESPONSABLE",
-    field: "responsable",
-    sortable: true,
-  },
-  {
-    name: "address",
-    align: "center",
-    label: "SEDE",
-    field: "address",
-    sortable: true,
-  },
+  
   { name: "action", label: "ACCION", field: "action", align: "center" },
 ];
 

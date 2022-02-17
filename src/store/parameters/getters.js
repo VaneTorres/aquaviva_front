@@ -1,6 +1,7 @@
 
 export function authenticated(state){
-    return state.token;
+   var token = state.token.split("|");
+    return token[1];
  }
  export function departament(state){
     return state.idDepartament;

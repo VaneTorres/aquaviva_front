@@ -85,7 +85,7 @@
 
 <script>
 import EssentialLink from "components/EssentialLink.vue";
-
+import { mapActions } from 'vuex';
 export default {
   name: "MainLayout",
 
@@ -95,32 +95,21 @@ export default {
   data() {
     return {
       leftDrawerOpen: false,
+
     };
   },
   methods: {
+     ...mapActions({
+            Storelogout: "parameters/logout"
+         }),
     logout() {
-      const autenticated = this.$q.localStorage.getItem("TOKEN");
-      this.$axios.defaults.headers.common["Authorization"] =
-        "Bearer " + autenticated;
-      this.$axios
-        .get("http://127.0.0.1:8000/api/logout")
-        .then((response) => {
-          this.$q.notify({
-            type: "positive",
-            message: `Sesión cerrada`,
-          });
-          this.$q.localStorage.clear();
-          this.$router.push({ path: "/" });
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      this.Storelogout();
     },
   },
 };
 </script>
 
-<style >
+<style>
 .q-drawer {
   background-size: cover !important;
 }

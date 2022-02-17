@@ -1,5 +1,4 @@
-import { route } from "quasar/wrappers";
-import router from ".";
+
 const routes = [
   {
     path: "/",
@@ -11,8 +10,17 @@ const routes = [
         name: "login",
       },
       {
+        path: "",
+        component: () => import("pages/ErrorPermission.vue"),
+        name: "ErrorPermission",
+      },
+      {
         path: "/forget",
-        component: () => import("pages/auth/Forget_password.vue"),
+        component: () => import("src/pages/auth/Forget.vue"),
+      },
+      {
+        path: "/forget/password/:token",
+        component: () => import("src/pages/auth/Password.vue"),
       },
     ],
   },
@@ -29,6 +37,7 @@ const routes = [
         path: "company",
         component: () => import("src/pages/company/Company.vue"),
         name: "company",
+        meta: { Company: true },
       },
       {
         path: "dashboard",
@@ -49,6 +58,11 @@ const routes = [
         path: "load_of_obligations",
         component: () => import("src/pages/load_of_obligations/obligation.vue"),
         name: "pma",
+      },
+      {
+        path: "program",
+        component: () => import("src/pages/program.vue"),
+        name: "program",
       },
       {
         path: "departments",
@@ -72,8 +86,13 @@ const routes = [
       },
       {
         path: "formatSIG",
-        component: () => import("src/pages/formatSIG.vue"),
+        component: () => import("src/pages/formatSig/formatSIG.vue"),
         name: "formatSIG",
+      },
+      {
+        path: "excel",
+        component: () => import("src/pages/formatSig/excel.vue"),
+        name: "excel",
       },
     ],
     meta: { requireAuth: true },

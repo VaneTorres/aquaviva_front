@@ -88,7 +88,7 @@
             />
           </div>
         </div>
-        <q-btn type="submit" label="Enviar" form="formAddress" class=" q-my-sm" />
+        <q-btn type="submit" color="primary" label="Enviar" form="formAddress" class=" q-my-sm" />
       </q-form>
     </q-card-section>
   </q-card>
@@ -133,9 +133,6 @@ export default {
       ],
       nameRules: [
         (v) => !!v || "Los nombres y apellidos son requeridos.",
-        (v) =>
-          !! /^[A-Z a-z]+$/.test(v) ||
-          "Los nombres y apellidos no deben tener números.",
       ],
       numberIdentificationRules: [
         (v) => !!v || "El número de identificación es requerido.",

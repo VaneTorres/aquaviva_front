@@ -109,7 +109,7 @@ export default {
       this.$router.push({ path: "/admin/organization" });
     },
     /* Fin muestra estructura organizacional */
-    registerDepartaments(info) {
+    registerDepartaments() {
       this.newDepartments = false;
       this.departaments();
     },

@@ -59,7 +59,7 @@
               no-caps
               flat
               dense
-              @click="seeval(props.row.id)"
+              @click="excel(props.row.id)"
             >
               <q-tooltip>Diligenciar formulario </q-tooltip>
             </q-btn>
@@ -121,8 +121,10 @@ export default {
     };
   },
   methods: {
+    excel(document){
+    this.$router.push({ path: "/admin/excel" });
+  },
     registerMonitoring(info) {
-      console.log(info);
       this.newMonitoring = false;
       this.rows.push({
         name: info.project,
@@ -139,7 +141,7 @@ export default {
       id_user: this.$q.localStorage.getItem("USER"),
     };
     this.$axios
-      .post("http://127.0.0.1:8000/api/get_projects", data)
+      .post("http://127.0.0.1:8000/api/get_excel_companies", data)
       .then((response) => {
         response.data.forEach((element) => {
           this.rows.push({

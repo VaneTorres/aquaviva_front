@@ -13,67 +13,75 @@
         class="text-center"
         @submit.prevent="registerAddress"
       >
-      <div class="row">
-        <q-input
-          v-model="addressName"
-          :rules="addressNameRules"
-          type="text"
-          class="col-md-6 q-pa-sm"
-          label="Nombre"
-        />
-        <q-input
-          v-model="description"
-          :rules="descriptionRules"
-          class="col-md-6 q-pa-sm"
-          autogrow
-          label="Descripción"
-        />
-        <q-select
-          use-input
-          :rules="townRule"
-          input-debounce="0"
-          @filter="filterTown"
-          v-model="town"
-          :options="options_town"
-          label="Municipio"
-          class="col-md-6 q-pa-sm"
+        <div class="row q-col-gutter-sm">
+          <q-input
+            v-model="addressName"
+            :rules="addressNameRules"
+            type="text"
+            class="col-md-6 col-12"
+            label="Nombre"
+          />
+          <q-input
+            v-model="description"
+            :rules="descriptionRules"
+            class="col-md-6 col-12"
+            autogrow
+            label="Descripción"
+          />
+          <q-select
+            use-input
+            :rules="townRule"
+            input-debounce="0"
+            @filter="filterTown"
+            v-model="town"
+            :options="options_town"
+            label="Municipio"
+            class="col-md-6 col-12"
+            color="primary"
+          />
+          <q-input
+            v-model="address"
+            :rules="addressRules"
+            type="text"
+            class="col-md-6 col-12"
+            label="Dirección"
+          />
+          <q-input
+            v-model="phone"
+            :rules="phoneRules"
+            class="col-md-6 col-12"
+            type="text"
+            label="Teléfono"
+          />
+          <q-input
+            v-model="contact"
+            :rules="contactRules"
+            class="col-md-6 col-12"
+            type="text"
+            label="Responsable"
+          />
+        </div>
+        <q-btn
+          class="q-my-sm"
           color="primary"
+          type="submit"
+          label="Enviar"
+          form="formAddress"
         />
-        <q-input
-          v-model="address"
-          :rules="addressRules"
-          type="text"
-          class="col-md-6 q-pa-sm"
-          label="Dirección"
-        />
-        <q-input
-          v-model="phone"
-          :rules="phoneRules"
-          class="col-md-6 q-pa-sm "
-          type="text"
-          label="Teléfono"
-        />
-        <q-input
-          v-model="contact"
-          :rules="contactRules"
-          class="col-md-6 q-pa-sm q-pb-xl"
-          type="text"
-          label="Responsable"
-        />
-      </div>
-      <q-btn type="submit" label="Enviar" form="formAddress" />
-
       </q-form>
     </q-card-section>
   </q-card>
 </template>
 <script>
+import { mapActions } from "vuex";
 const stringTownOptions = [];
 export default {
-  props:{ id_company: {
-      type: Number
-    },},
-data() {
+  props: {
+    id_company: {
+      type: Number,
+    },
+  },
+  data() {
     return {
       //MODEL-VALUE
       addressName: null,
@@ -82,7 +90,7 @@ data() {
       address: null,
       phone: null,
       contact: null,
-     valid:true,
+      valid: true,
       options_town: stringTownOptions,
       //VALIDATE
       townRule: [(v) => !!v || "El municipio es requerido."],
@@ -93,70 +101,54 @@ data() {
       addressRules: [(v) => !!v || "La dirección de la sede es requerida."],
       phoneRules: [(v) => !!v || "El teléfono de la sede es requerido."],
       contactRules: [(v) => !!v || "El responsable de la sede es requerido."],
-      
-    };},
-    methods:{
-      //FILTRO DEL SELECT
-      filterTown(val, update) {
+    };
+  },
+  methods: {
+    ...mapActions({
+      GetTown: "parameters/GetTown",
+      StorePost: "parameters/PostAxios",
+    }),
+    //FILTRO DEL SELECT
+    filterTown(val, update) {
       if (val === "") {
         update(() => {
-          this.options_town = stringTownOptions;
+          this.options_town = stringTownOptions[0];
         });
         return;
       }
       update(() => {
         const needle = val.toLowerCase();
-        this.options_town = stringTownOptions.filter(
+        this.options_town= stringTownOptions[0].filter(
           (v) => v.value.toLowerCase().indexOf(needle) > -1
         );
       });
+      console.log(this.options_town);
     },
     //REGISTRO DE SELECT
-      registerAddress(){
-        var data={
-         id_company: this.id_company,
-         addressName: this.addressName,
-          address: this.address,
-          phone:this.phone,
-          contact: this.contact,
-          description: this.description,
-          town: this.town.id,
-          town_name: this.town.label,
-          type_address:"Secundaria"
-        }
-        
-        this.$axios
-      .post("http://127.0.0.1:8000/api/store_address",data)
-      .then((response) => {
-         this.$emit("new", data);
-       this.$q.notify({
-              message:
-                "Se ha registrado correctamente.",
-              type: "positive",
-            });
-      })
-      .catch((e) => {
-        console.log(e);
+    registerAddress() {
+      var data = {
+        id_company: this.id_company,
+        addressName: this.addressName,
+        address: this.address,
+        phone: this.phone,
+        contact: this.contact,
+        description: this.description,
+        town: this.town.id,
+        town_name: this.town.label,
+        type_address: "Secundaria",
+      };
+      this.StorePost({
+        context: "http://127.0.0.1:8000/api/store_address",
+        data: data,
+      }).then((response) => {
+        this.$emit("new", data);
       });
-      }
     },
-  mounted(){
-    //CONSULTAR LOS MUNICIPIOS
-   this.$axios
-      .get("http://127.0.0.1:8000/api/get_towns")
-      .then((response) => {
-        response.data.forEach((element) => {
-          this.options_town.push({
-            label: element.town.toString(),
-            value: element.town,
-            id: element.id.toString(),
-          });
-        });
-        stringTownOptions = this.options_town;
-      })
-      .catch((e) => {
-        console.log(e);
+  },
+  mounted() {
+     this.GetTown().then((response) => {
+        stringTownOptions.push(response);
       });
-  }
+  },
 };
 </script>

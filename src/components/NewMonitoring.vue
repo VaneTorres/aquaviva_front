@@ -62,7 +62,7 @@
             color="primary"
           />
         </div>
-        <q-btn type="submit" label="Enviar" form="formAddress" />
+        <q-btn color="primary" type="submit" label="Enviar" form="formAddress" />
       </q-form>
     </q-card-section>
   </q-card>

@@ -15,19 +15,93 @@
     >
       <div class="row q-col-gutter-sm">
         <q-select
+          v-model="obligation"
           use-input
+          class="col-md-12 col-12"
           :rules="obligationRule"
           input-debounce="0"
-          @filter="filterTool"
-          v-model="obligation"
           :options="optionsobligation"
+          @filter="filterTool"
           label="Obligación"
-          class="col-md-12 col-12"
           color="primary"
-        />
+          data-vv-scope="formnew"
+        >
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey"
+                >No hay resultados
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-slot:option="scope">
+            <q-item v-bind="scope.itemProps">
+              <q-item-section>
+                <q-item-label v-html="scope.opt.label" />
+                <q-item-label caption>{{ scope.opt.description }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
+        <q-select
+          v-model="obligation"
+          use-input
+          class="col-md-6 col-6"
+          :rules="obligationRule"
+          input-debounce="0"
+          :options="optionsobligation"
+          @filter="filterTool"
+          label="Programa"
+          color="primary"
+          data-vv-scope="formnew"
+        >
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey"
+                >No hay resultados
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-slot:option="scope">
+            <q-item v-bind="scope.itemProps">
+              <q-item-section>
+                <q-item-label v-html="scope.opt.label" />
+                <q-item-label caption>{{ scope.opt.description }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
+        <q-select
+          v-model="obligation"
+          use-input
+          class="col-md-6 col-6"
+          :rules="obligationRule"
+          input-debounce="0"
+          :options="optionsobligation"
+          @filter="filterTool"
+          label="Proyectos"
+          color="primary"
+          data-vv-scope="formnew"
+        >
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey"
+                >No hay resultados
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-slot:option="scope">
+            <q-item v-bind="scope.itemProps">
+              <q-item-section>
+                <q-item-label v-html="scope.opt.label" />
+                <q-item-label caption>{{ scope.opt.description }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
         <q-input
+        autogrow
           v-model="name"
-          type="text"
+          type="textarea"
           class="col-md-6 col-12"
           label="Nombre"
         />
@@ -239,6 +313,7 @@
   </q-stepper>
 </template>
 <script>
+import { mapActions } from "vuex";
 var stringToolOptions = [];
 var stringResponsableOptions = [];
 var stringAddressOptions = [];
@@ -379,19 +454,23 @@ export default {
       optionseditdate: ["Variable", "Fija"],
       //Validaciones
       obligationRule: [(v) => !!v || "La obligación es requerida."],
-      dateInitialRules: [
+      /* dateInitialRules: [
         (v) =>
           v >= today ||
           "La fecha final tiene que ser mayor a la fecha actual " + today + ".",
-      ],
-      dateFinalRules: [
+      ], */
+     /*  dateFinalRules: [
         (v) =>
           v > this.startdate ||
           "La fecha final tiene que ser mayor de la fecha inicial.",
-      ],
+      ], */
     };
   },
   methods: {
+    ...mapActions({
+      GetTool: "parameters/GetTool",
+      StorePost: "parameters/PostAxios",
+    }),
     /* Consulta los usuarios una vez seleccione la sede */
     UserbyAddress() {
       var data = { id_address: this.address.id };
@@ -459,11 +538,16 @@ export default {
     },
     //Filtros de select
     filterTool(val, update) {
+      if (val === "") {
+        update(() => {
+          this.optionsobligation = stringToolOptions[0];
+        });
+        return;
+      }
       update(() => {
-        this.optionsobligation = this.filter(
-          val,
-          this.optionsobligation,
-          stringToolOptions
+        const needle = val.toLowerCase();
+        this.optionsobligation = stringToolOptions[0].filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
         );
       });
     },
@@ -510,25 +594,23 @@ export default {
         indicator: this.rowsIndicator,
         activity: this.rowsActivity,
       };
-      this.$axios
-        .post("http://127.0.0.1:8000/api/create_worksheets", data)
-        .then((response) => {
-          this.$q.notify({
-            message: this.obligation.label + "Se ha registrado con exito.",
-            type: "negative",
-          });
-          this.$emit("new", data);
-        })
-        .catch((e) => {
-          console.log(e);
+      this.StorePost({
+        context: "http://127.0.0.1:8000/api/create_worksheets",
+        data: data,
+      }).then((response) => {
+        this.StorePost({
+          context: "http://127.0.0.1:8000/api/getCellByExcel",
+          data: response.data,
+        }).then((response) => {
+          console.log(response);
         });
+      });
       /* this.$emit("new", data); */
     },
   },
-  created() {
+  mounted() {
     /* Vaciar los select del componente*/
     this.optionsmoney = [];
-    stringToolOptions = [];
     stringAddressOptions = [];
     /*Trae las monedas registradas*/
     this.$axios
@@ -546,21 +628,10 @@ export default {
         console.log(e);
       });
     /*Trae las obligaciones*/
-    this.$axios
-      .get("http://127.0.0.1:8000/api/get_tools")
-      .then((response) => {
-        response.data.forEach((element) => {
-          stringToolOptions.push({
-            label: element.tool.toString(),
-            value: element.tool,
-            id: element.id.toString(),
-          });
-        });
-        this.optionsobligation = stringToolOptions;
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    this.GetTool().then((response) => {
+      stringToolOptions.push(response);
+    });
+
     /*Trae las sedes del usuario logueado*/
     var data = {
       id_user: this.$q.localStorage.getItem("USER"),

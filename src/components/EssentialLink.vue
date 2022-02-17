@@ -1,13 +1,13 @@
 <template>
-  <q-item clickable tag="a" href="/admin/dashboard">
+   <q-item clickable tag="a" href="/admin/dashboard">
     <q-item-section avatar>
       <q-icon name="dashboard" />
     </q-item-section>
     <q-item-section>
       <q-item-label>Dashboard</q-item-label>
     </q-item-section>
-  </q-item>
-  <q-item clickable tag="a" to="/admin/company">
+  </q-item >
+ <q-item clickable tag="a" to="/admin/company" v-if="permissions.includes('Listar empresa')">
     <q-item-section avatar>
       <q-icon name="business" />
     </q-item-section>
@@ -31,14 +31,14 @@
       <q-item-label>Planes</q-item-label>
     </q-item-section>
   </q-item>
-  <q-item clickable tag="a" to="/admin/plans">
+   <q-item clickable tag="a" to="/admin/plans">
     <q-item-section avatar>
       <q-icon name="mdi-ballot-outline" />
     </q-item-section>
     <q-item-section>
       <q-item-label>Parametrizar planes</q-item-label>
     </q-item-section>
-  </q-item>
+  </q-item> 
   <q-expansion-item
     class="q-py-sm"
     icon="mdi-clipboard-text-search-outline"
@@ -50,7 +50,7 @@
           <q-icon name="mdi-clipboard-text-search-outline" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>Monitoreo ambiental</q-item-label>
+          <q-item-label>Monitoreo ambiental </q-item-label>
         </q-item-section>
       </q-item>
       <q-item clickable tag="a" to="/admin/formatSIG">
@@ -88,6 +88,14 @@
     </q-list>
   </q-expansion-item>
 
+  <q-item clickable tag="a" to="/admin/program">
+    <q-item-section avatar>
+      <q-icon name="mdi-file-tree-outline" />
+    </q-item-section>
+    <q-item-section>
+      <q-item-label>Parametrizar programas</q-item-label>
+    </q-item-section>
+  </q-item>
   <q-item clickable tag="a" to="/admin/departments">
     <q-item-section avatar>
       <q-icon name="mdi-file-tree-outline" />
@@ -103,5 +111,13 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "EssentialLink",
+  data() {
+    return {
+      permissions:[]
+    };
+  },
+  mounted(){
+    this.permissions=this.$q.localStorage.getItem('PERMISSIONS')
+  }
 });
 </script>

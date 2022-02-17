@@ -9,29 +9,36 @@
   >
     <!-- Start Company -->
     <q-step :name="1" title="Empresa" icon="business" :done="step > 1">
-      <div class="row">
+      <q-form
+        class="row q-col-gutter-sm"
+        v-model="valid"
+        ref="form"
+        lazy-validation
+      >
         <q-input
           v-model="nit"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           :rules="nitRules"
           type="text"
-          label="NIT"
+          label="NIT (*)"
+          data-vv-scope="formnew"
         />
         <q-select
           v-model="codeCiiu"
           use-input
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           :rules="codeCiiuRule"
           input-debounce="0"
           :options="options_ciiu"
-          @filter="filterFn"
-          label="Código CIIU"
+          @filter="filterCiiu"
+          label="Código CIIU (*)"
           color="primary"
+          data-vv-scope="formnew"
         >
           <template v-slot:no-option>
             <q-item>
               <q-item-section class="text-grey"
-                >No hay esultados
+                >No hay resultados
               </q-item-section>
             </q-item>
           </template>
@@ -47,12 +54,13 @@
         <q-uploader
           @added="factoryFn"
           :factory="factoryFn"
-          class="col-md-12 q-pa-sm q-mt-md"
+          class="col-12 q-mt-md"
           :filter="checkFileType"
-          label="Cargar Logo (Formato png, jpeg)"
+          label="Cargar Logo (Formato png, jpeg) "
           @rejected="onRejected"
+          data-vv-scope="formnew"
         />
-      </div>
+      </q-form>
     </q-step>
     <!-- Finish Company -->
     <!-- Start Address  -->
@@ -62,20 +70,25 @@
       icon="mdi-map-marker"
       :done="step > 1"
     >
-      <div class="row">
+      <q-form
+        class="row q-col-gutter-sm"
+        v-model="valid"
+        ref="form"
+        lazy-validation
+      >
         <q-input
           v-model="addressName"
           :rules="addressNameRules"
           type="text"
-          class="col-md-6 q-pa-sm"
-          label="Nombre"
+          class="col-md-6 col-12"
+          label="Nombre  (*)"
         />
         <q-input
           v-model="description"
           :rules="descriptionRules"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           autogrow
-          label="Descripción"
+          label="Descripción  (*)"
         />
         <q-select
           use-input
@@ -84,74 +97,79 @@
           @filter="filterTown"
           v-model="town"
           :options="options_town"
-          label="Municipio"
-          class="col-md-6 q-pa-sm"
+          label="Municipio  (*)"
+          class="col-md-6 col-12"
           color="primary"
         />
         <q-input
           v-model="address"
           :rules="addressRules"
           type="text"
-          class="col-md-6 q-pa-sm"
-          label="Dirección"
+          class="col-md-6 col-12"
+          label="Dirección (*)"
         />
         <q-input
           v-model="phone"
           :rules="phoneRules"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           type="text"
-          label="Teléfono"
+          label="Teléfono (*)"
         />
         <q-input
           v-model="contact"
           :rules="contactRules"
-          class="col-md-6 q-pa-sm"
+          class="col-md-6 col-12"
           type="text"
-          label="Responsable"
+          label="Responsable (*)"
         />
-      </div>
+      </q-form>
     </q-step>
     <!-- Finish Address  -->
     <!-- Start Admin  -->
     <q-step :name="3" title="Administrador" icon="person" :done="step > 2">
-      <div class="row">
+      <q-form
+        class="row q-col-gutter-sm"
+        v-model="valid"
+        ref="form"
+        lazy-validation
+      >
         <q-select
           v-model="type_document"
           :options="options_type_document"
           :rules="typeDocumentRules"
           color="primary"
-          label="Tipo de documento"
-          class="col-md-6 q-pa-sm"
+          label="Tipo de documento (*)"
+          class="col-md-6 col-12"
         />
         <q-input
           v-model="numberIdentification"
           :rules="numberIdentificationRules"
           type="text"
-          label="Número de identificación"
-          class="col-md-6 q-pa-sm"
+          label="Número de identificación (*)"
+          class="col-md-6 col-12"
         />
         <q-input
           v-model="name"
           :rules="nameRules"
           type="text"
-          label="Nombre(s) y apellido(s)"
-          class="col-md-6 q-pa-sm"
+          label="Nombre(s) y apellido(s) (*)"
+          class="col-md-6 col-12"
         />
         <q-input
           v-model="mobile"
           :rules="mobileRules"
           type="text"
-          label="Número de celular"
-          class="col-md-6 q-pa-sm"
+          label="Número de celular (*)"
+          class="col-md-6 col-12"
         />
         <q-input
           v-model="email"
           :rules="emailRules"
           type="text"
-          label="Correo electrónico"
-          class="col-md-6 q-pa-sm"
+          label="Correo electrónico (*)"
+          class="col-md-6 col-12"
         />
-      </div>
+      </q-form>
     </q-step>
     <!-- Finish Admin  -->
     <!-- Button action  -->
@@ -159,7 +177,7 @@
       <q-stepper-navigation>
         <q-btn
           v-show="step != 3 ? true : false"
-          @click="$refs.stepper.next()"
+          @click="next()"
           color="primary"
           label="Continuar"
         />
@@ -182,14 +200,16 @@
   </q-stepper>
 </template>
 <script>
-var stringCiiuOptions = [];
-var stringTownOptions = [];
+import { mapActions } from "vuex";
+const stringCiiuOptions = [];
+const stringTownOptions = [];
 
 export default {
   data() {
     return {
       //MODEL-VALUE
       step: 1,
+      valid: true,
       nit: null,
       codeCiiu: null,
       logo: null,
@@ -219,50 +239,65 @@ export default {
       addressRules: [(v) => !!v || "La dirección de la sede es requerida."],
       phoneRules: [
         (v) => !!v || "El teléfono de la sede es requerido.",
-        (v) => v.length <= 10 || "El teléfono de la sede debe de ser valido.",
         (v) =>
-          /^[0-9]/.test(v) || "El teléfono de la sede no debe tener letras.",
+          v.length <= 10 ||
+          "El teléfono de la sede debe de ser máximo de 10 caracteres.",
+        (v) =>
+          v.length >= 7 ||
+          "El teléfono de la sede debe de ser mínimo de 7 caracteres.",
+        (v) =>
+          /^[0-9]+$/i.test(v) || "El teléfono de la sede no debe tener letras.",
       ],
-      contactRules: [
-        (v) => !!v || "El responsable es requerido.",
-        (v) => /^[A-Za-z]+$/.test(v) || "El responsable no debe tener números.",
-      ],
+      contactRules: [(v) => !!v || "El responsable es requerido."],
       numberIdentificationRules: [
         (v) => !!v || "El número de identificación es requerido.",
       ],
-      typeDocumentRules: [
-        (v) => !!v || "El tipo de documento es requerido.",
-      ],
+      typeDocumentRules: [(v) => !!v || "El tipo de documento es requerido."],
 
-      nameRules: [
-        (v) => !!v || "Los nombres y apellidos son requeridos.",
-        (v) =>
-          /^[A-Za-z]+$/.test(v) ||
-          "Los nombres y apellidos no deben tener números",
-      ],
+      nameRules: [(v) => !!v || "Los nombres y apellidos son requeridos."],
       mobileRules: [
         (v) => !!v || "El número de celular es requerido.",
-        (v) => v.length <= 10 || "El número de celular debe de ser válido.",
-        (v) => /^[0-9]/.test(v) || "El número de celular no debe tener letras",
+        (v) =>
+          v.length <= 10 ||
+          "El número de celular debe de ser máximo de 10 caracteres.",
+        (v) =>
+          v.length >= 7 ||
+          "El número de celular debe de ser mínimo de 7 caracteres.",
+        (v) => /^[0-9]+$/i.test(v) || "El número de celular no debe tener letras",
       ],
       emailRules: [
         (v) => !!v || "El correo electrónico es requerido.",
         (v) =>
           !!/^[-\w.%+]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i.test(
             v
-          ) || "El correo electrónico no es valido.",
+          ) || "El correo electrónico no es válido.",
       ],
     };
   },
   methods: {
-    /* Medoto que envia formulario */
-    submit() {
-      const autenticated = this.$q.localStorage.getItem("TOKEN");
-      const data = {
-        nit: this.nit,
-        codeCiiu: this.codeCiiu.id,
-        logo: this.logo,
-        address: {
+    /* VUEX */
+    ...mapActions({
+      GetTown: "parameters/GetTown",
+      GetCiiu: "parameters/GetCiiu",
+      GetDocumentTypes: "parameters/GetDocumentTypes",
+      StorePost: "parameters/PostAxios",
+    }),
+    /* Validar formulario antes de mostrar el siguiente proceso */
+    async next() {
+      const isValid = await this.$refs.form.validate();
+      if (isValid) {
+        this.$refs.stepper.next();
+      }
+    },
+    /* Fin validar formulario antes de mostrar el siguiente proceso */
+
+    async submit() {
+      /* Validar formulario */
+      const isValid = await this.$refs.form.validate();
+      
+      if (isValid) {
+        /* Metodo que envia formulario */
+        var address = {
           addressName: this.addressName,
           address: this.address,
           phone: this.phone,
@@ -270,38 +305,41 @@ export default {
           description: this.description,
           town: this.town.id,
           type_address: "Principal",
-        },
-        user: {
+        };
+        var user = {
           document_type: this.type_document.id,
           document: this.numberIdentification,
           name: this.name,
           mobile: this.mobile,
           email: this.email,
-        },
-      };
-      this.$axios.defaults.headers.common["Authorization"] =
-        "Bearer " + autenticated;
-      this.$axios
-        .post("http://127.0.0.1:8000/api/company_creation", data)
-        .then((response) => {
-          const fileData = new FormData();
-          fileData.append("logo ", this.logo);
-          this.$axios
-            .post("http://127.0.0.1:8000/api/save_logo", fileData)
-            .then((response) => {
-              this.$emit("new", data);
-              this.$q.notify({
-                type: "positive",
-                message: `La empresa se registro con exito`,
-              });
-            })
-            .catch((e) => {
-              console.log(e);
-            });
+        };
+        const data = new FormData();
+        data.append("logo", this.logo);
+        data.append("nit", this.nit);
+        data.append("codeCiiu", this.codeCiiu.id);
+        data.append("address", JSON.stringify(address));
+        data.append("user", JSON.stringify(user));
+        var headers = {
+          "Content-Type": "multipart/form-data",
+        };
+        /* Guardar empresa */
+        this.StorePost({
+          context: "http://127.0.0.1:8000/api/company_creation",
+          data: data,
+          headers: headers,
         })
-        .catch((e) => {
-          console.log(e);
-        });
+          .then((response) => {
+            this.$emit("new");
+          })
+          .catch((e) => {
+            if (e.data.code == 402){
+              this.emailRules.push((v) =>e.data.code != 402|| "Este correo " + this.email + " ya existe.");
+              this.submit();
+              this.emailRules.pop();
+            }
+          });
+        /* Fin guardar empresa */
+      }
     },
     /* Validación de imagen */
     checkFileType(files) {
@@ -315,27 +353,28 @@ export default {
         message: `¡Formato no válido! por favor revise el formato del archivo`,
       });
     },
+    /* Fin validación de imagen */
     /* Guardar imagen */
     factoryFn(file) {
       this.logo = file[0];
     },
+    /* Fin guardar imagen */
     /* Flitro en los select */
-    filterFn(val, update) {
+    filterCiiu(val, update) {
       if (val === "") {
         update(() => {
-          this.options_ciiu = stringCiiuOptions;
+          this.options_ciiu = stringCiiuOptions[0];
         });
         return;
       }
-
       update(() => {
         const needle = val.toLowerCase();
         if (!isNaN(needle)) {
-          this.options_ciiu = stringCiiuOptions.filter(
+          this.options_ciiu = stringCiiuOptions[0].filter(
             (v) => v.value.toLowerCase().indexOf(needle) > -1
           );
         } else {
-          this.options_ciiu = stringCiiuOptions.filter(
+          this.options_ciiu = stringCiiuOptions[0].filter(
             (v) => v.description.toLowerCase().indexOf(needle) > -1
           );
         }
@@ -344,68 +383,35 @@ export default {
     filterTown(val, update) {
       if (val === "") {
         update(() => {
-          this.options_town = stringTownOptions;
+          this.options_town = stringTownOptions[0];
         });
         return;
       }
 
       update(() => {
         const needle = val.toLowerCase();
-        this.options_town = stringTownOptions.filter(
+        this.options_town = stringTownOptions[0].filter(
           (v) => v.value.toLowerCase().indexOf(needle) > -1
         );
       });
     },
   },
-  created() {
-    /* Consultar datos para los select */
-    this.options_ciiu = [];
-    this.options_town = [];
-    this.$axios
-      .get("http://127.0.0.1:8000/api/get_ciiu")
-      .then((response) => {
-        response.data.forEach((element) => {
-          this.options_ciiu.push({
-            label: element.ciiu.toString(),
-            value: element.ciiu.toString(),
-            id: element.id.toString(),
-            description: element.description.toString(),
-          });
-        });
-         stringCiiuOptions=this.options_ciiu;
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-    this.$axios
-      .get("http://127.0.0.1:8000/api/get_towns")
-      .then((response) => {
-        response.data.forEach((element) => {
-          this.options_town.push({
-            label: element.town.toString(),
-            value: element.town,
-            id: element.id.toString(),
-          });
-        });
-        stringTownOptions=this.options_town;
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-    this.$axios
-      .get("http://127.0.0.1:8000/api/get_document_types")
-      .then((response) => {
-        response.data.forEach((element) => {
-          this.options_type_document.push({
-            label: element.type,
-            value: element.type,
-            id: element.id,
-          });
-        });
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+  mounted() {
+    /* Llenar select Ciiu */
+    this.GetCiiu().then((response) => {
+      stringCiiuOptions.push(response);
+    });
+    /* Fin llenar select Ciiu */
+    /* llenar select municipios */
+    this.GetTown().then((response) => {
+      stringTownOptions.push(response);
+    });
+    /* Fin llenar select municipios */
+    /* llenar select tipos de documentos */
+    this.GetDocumentTypes().then((response) => {
+      this.options_type_document = response;
+    });
+    /* Fin llenar select tipos de documentos */
   },
 };
 </script>

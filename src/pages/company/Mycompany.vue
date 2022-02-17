@@ -1,16 +1,27 @@
 <template>
   <q-page>
     <div class="row q-col-gutter-sm q-ma-xs q-mr-sm">
+      <!-- INFORMACIÓN GENERAL DE LA EMPRESA -->
       <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
         <q-card flat bordered class>
           <q-card-section>
             <div class="text-h6">Información de la compañia</div>
           </q-card-section>
-
           <q-separator inset></q-separator>
-
           <q-card-section>
             <q-list>
+              <q-item>
+                <q-item-section>
+                  <q-img
+                    :src="
+                      data.logo != null
+                        ? 'http://localhost:8000/img/companies/' + data.logo
+                        : 'http://localhost:8000/img/companies/sin_logo.png'
+                    "
+                    fit="contain"
+                  ></q-img>
+                </q-item-section>
+              </q-item>
               <q-item>
                 <q-item-section>
                   <q-item-label class="q-pb-xs"
@@ -39,32 +50,43 @@
           </q-card-section>
         </q-card>
       </div>
+      <!-- FIN INFORMACIÓN GENERAL DE LA EMPRESA -->
+
+      <!-- INFORMACIÓN DE SEDES DE LA EMPRESA -->
       <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
         <q-card flat bordered class>
           <q-card-section>
-            <div class="row ">
-              <div class="text-h6 col-md-6">Sedes</div>
-              <div class="offset-md-5">
-                <q-btn round color="primary" icon="add" @click="newaddress = true" />
+            <div class="row justify-between">
+              <div class="text-h6 col-2">Sedes</div>
+              <div class="col-2">
+                <q-btn
+                  round
+                  color="primary"
+                  icon="add"
+                  @click="newaddress = true"
+                />
               </div>
             </div>
           </q-card-section>
-
           <q-separator inset></q-separator>
           <q-table :rows="rows" :columns="columns" row-key="name" />
           <q-card-section> </q-card-section>
         </q-card>
       </div>
+      <!-- FIN INFORMACIÓN DE SEDES DE LA EMPRESA -->
     </div>
-    <q-dialog v-model="newaddress" >
-        <NewAddress :id_company="id_company" v-on:new="registerAddress"/>
-      </q-dialog>
+
+    <!-- MODAL DE NUEVA SEDE -->
+    <q-dialog v-model="newaddress">
+      <NewAddress :id_company="id_company" v-on:new="registerAddress" />
+    </q-dialog>
+    <!--NEW MODAL DE NUEVA SEDE -->
   </q-page>
 </template>
 
 <script>
 import NewAddress from "src/components/NewAddress.vue";
-
+import { mapActions } from "vuex";
 
 const columns = [
   {
@@ -86,7 +108,7 @@ const columns = [
   {
     name: "address",
     align: "center",
-    label: "DIRECCION DE LA SEDE",
+    label: "DIRECCIÓN DE LA SEDE",
     field: "address",
     sortable: true,
   },
@@ -100,7 +122,7 @@ const columns = [
   {
     name: "address_description",
     align: "center",
-    label: "DESCRIPCION DE LA SEDE",
+    label: "DESCRIPCIÓN DE LA SEDE",
     field: "address_description",
     sortable: true,
   },
@@ -114,57 +136,54 @@ const columns = [
   {
     name: "phone",
     align: "center",
-    label: "TELEFONO",
+    label: "TELÉFONO",
     field: "phone",
     sortable: true,
   },
 ];
-
-const originalRows = [];
 export default {
   components: {
     NewAddress,
   },
   data() {
     return {
-      newaddress:false,
+      newaddress: false,
       columns,
-      id_company:null,
+      id_company: null,
       data: {
         ciiu: null,
         ciiu_description: null,
         nit: null,
       },
-      rows: originalRows,
+      rows: [],
     };
   },
-  methods:{
+  methods: {
+    /* VUEZ */
+    ...mapActions({
+      StorePost: "parameters/PostAxios",
+    }),
+    /* REGISTRAR SEDE */
     registerAddress(info) {
-      console.log(info);
-      this.newaddress=false;
-      this.rows.push({
-            type: info.type_address,
-            nombre_sede: info.addressName,
-            address: info.address,
-            town: info.town_name,
-            address_description: info.description,
-            contact_person: info.contact,
-            phone: info.phone,
-          });
+      this.newaddress = false;
+      this.dataCompany();
     },
-  },
-  mounted() {
-    var data = {
-      id_user: this.$q.localStorage.getItem("USER"),
-    };
-    this.$axios
-      .post("http://127.0.0.1:8000/api/get_address_by_users", data)
-      .then((response) => {
-        this.id_company=response.data.company.id_company;
+    /* CONSULTAR INFORMACIÓN DE LA EMPRESA Y SUS SEDES */
+    dataCompany() {
+      this.rows = [];
+      var data = {
+        id_user: this.$q.localStorage.getItem("USER"),
+      };
+      this.StorePost({
+        context: "http://127.0.0.1:8000/api/get_address_by_users",
+        data,
+      }).then((response) => {
+        this.id_company = response.data.company.id_company;
         this.data = {
           ciiu: response.data.company.ciiu,
           ciiu_description: response.data.company.ciiu_description,
           nit: response.data.company.nit,
+          logo: response.data.company.logo,
         };
         response.data.address.forEach((element) => {
           this.rows.push({
@@ -177,10 +196,11 @@ export default {
             phone: element.phone,
           });
         });
-      })
-      .catch((e) => {
-        console.log(e);
       });
+    },
+  },
+  mounted() {
+    this.dataCompany();
   },
 };
 </script>

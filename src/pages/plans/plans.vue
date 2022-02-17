@@ -95,6 +95,7 @@ const columns = [
 
 const originalRows = [
   { name: "Versión FULL", price: "1000", status: "Activo" },
+  { name: "Básico", price: "100000", status: "Activo" },
 ];
 
 export default {
@@ -128,10 +129,10 @@ export default {
     },
     registerPlans(info) {
       this.newPlans = false;
-      this.rows.push({
+      /* this.rows.push({
         name: info.name,
         price: info.address_label,
-      });
+      }); */
     },
   },
 };

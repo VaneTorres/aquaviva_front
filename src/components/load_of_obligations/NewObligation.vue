@@ -15,14 +15,93 @@
     >
       <div class="row q-col-gutter-sm">
         <q-select
-          v-model="obligation"
+          v-model="projectMonitoring"
           use-input
-          class="col-md-12 col-12"
-          :rules="obligationRule"
+          class="col-md-6 col-12"
+          :rules="projectMonitoringRule"
           input-debounce="0"
-          :options="optionsobligation"
-          @filter="filterTool"
-          label="Obligación"
+          :options="optionsprojectMonitoring"
+          @filter="filterProjectMonitoring"
+          label="Proyecto de monitoreo (*)"
+          color="primary"
+          data-vv-scope="formnew"
+        >
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey"
+                >No hay resultados
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-slot:option="scope">
+            <q-item v-bind="scope.itemProps">
+              <q-item-section>
+                <q-item-label v-html="scope.opt.label" />
+                <q-item-label caption>{{ scope.opt.description }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
+        <q-select
+          v-model="phase"
+          use-input
+          class="col-md-6 col-12"
+          input-debounce="0"
+          :rules="phaseRule"
+          :options="optionsphase"
+          label="Tipo de fase (*)"
+          color="primary"
+          data-vv-scope="formnew"
+        >
+        </q-select>
+        <q-select
+          use-input
+          :rules="mediumsRule"
+          input-debounce="0"
+          @filter="filtermediums"
+          v-model="mediums"
+          :options="optionmediums"
+          label="Medio (*)"
+          class="col-md-6 col-12"
+          color="primary"
+        />
+        <q-select
+          v-model="program"
+          use-input
+          class="col-md-6 col-12"
+          :rules="programRule"
+          input-debounce="0"
+          :options="options_program"
+          @filter="filterProgram"
+          @update:model-value="(v) => listProject(v.id)"
+          label="Programa (*)"
+          color="primary"
+          data-vv-scope="formnew"
+        >
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey"
+                >No hay resultados
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-slot:option="scope">
+            <q-item v-bind="scope.itemProps">
+              <q-item-section>
+                <q-item-label v-html="scope.opt.label" />
+                <q-item-label caption>{{ scope.opt.description }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
+        <q-select
+          v-model="project"
+          use-input
+          class="col-md-6 col-6"
+          input-debounce="0"
+          :options="optionsproject"
+          @filter="filterProject"
+          label="Proyecto"
           color="primary"
           data-vv-scope="formnew"
         >
@@ -45,40 +124,12 @@
         <q-select
           v-model="obligation"
           use-input
-          class="col-md-6 col-6"
+          class="col-md-6 col-12"
           :rules="obligationRule"
           input-debounce="0"
           :options="optionsobligation"
           @filter="filterTool"
-          label="Programa"
-          color="primary"
-          data-vv-scope="formnew"
-        >
-          <template v-slot:no-option>
-            <q-item>
-              <q-item-section class="text-grey"
-                >No hay resultados
-              </q-item-section>
-            </q-item>
-          </template>
-          <template v-slot:option="scope">
-            <q-item v-bind="scope.itemProps">
-              <q-item-section>
-                <q-item-label v-html="scope.opt.label" />
-                <q-item-label caption>{{ scope.opt.description }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-select>
-        <q-select
-          v-model="obligation"
-          use-input
-          class="col-md-6 col-6"
-          :rules="obligationRule"
-          input-debounce="0"
-          :options="optionsobligation"
-          @filter="filterTool"
-          label="Proyectos"
+          label="Obligación (*)"
           color="primary"
           data-vv-scope="formnew"
         >
@@ -99,17 +150,11 @@
           </template>
         </q-select>
         <q-input
-        autogrow
+          autogrow
           v-model="name"
           type="textarea"
           class="col-md-6 col-12"
           label="Nombre"
-        />
-        <q-input
-          v-model="code"
-          type="text"
-          class="col-md-6 col-12"
-          label="Código"
         />
         <q-input
           v-model="objetive"
@@ -127,11 +172,10 @@
           autogrow
         >
         </q-input>
-
         <q-input
           v-model="observations"
           type="textarea"
-          class="col-md-12 col-12"
+          class="col-md-6 col-12"
           label="Observaciones"
           autogrow
         >
@@ -214,7 +258,6 @@
           formatModel="string"
           format="YYYY-MM-DD"
           label="Fecha inicial"
-          :rules="dateInitialRules"
           class="col-md-6 col-12"
           type="date"
           stack-label
@@ -224,7 +267,6 @@
           formatModel="string"
           format="YYYY-MM-DD"
           label="Fecha final"
-          :rules="dateFinalRules"
           class="col-md-6 col-12"
           type="date"
           stack-label
@@ -292,12 +334,14 @@
           @click="$refs.stepper.next()"
           color="primary"
           label="Continuar"
+          class="float-right q-my-md"
         />
         <q-btn
           v-show="step === 3 ? true : false"
           color="primary"
           label="Finalizar carga de oblicaciones"
           @click="submit()"
+          class="float-right q-my-md"
         />
         <q-btn
           v-if="step > 1"
@@ -305,7 +349,7 @@
           color="primary"
           @click="$refs.stepper.previous()"
           label="Anterior"
-          class="q-ml-sm"
+          class="q-ml-sm float-right q-my-md"
         />
       </q-stepper-navigation>
     </template>
@@ -317,6 +361,10 @@ import { mapActions } from "vuex";
 var stringToolOptions = [];
 var stringResponsableOptions = [];
 var stringAddressOptions = [];
+const stringProgramOptions = [];
+const stringProjectMonitoringOptions = [];
+const stringmediumsOptions = [];
+const stringProjectOptions = [];
 /* Columnas tabla de indicadores */
 const columnsIndicator = [
   {
@@ -415,14 +463,23 @@ export default {
       step: 1,
       valid: true,
       obligation: null,
+      project: null,
       name: null,
-      code: null,
       objetive: null,
       goal: null,
       observations: null,
+      program: null,
+      mediums: null,
+      projectMonitoring: null,
+      phase: null,
+      optionsphase: ["Constructiva", "Operativa"],
+      options_program: stringProgramOptions,
+      optionsprojectMonitoring: stringProjectMonitoringOptions,
       optionsobligation: stringToolOptions,
+      optionsproject: stringProjectOptions,
       optionsAddress: stringAddressOptions,
       optionsresponsable: stringResponsableOptions,
+      optionmediums: stringmediumsOptions,
       /* model indicador */
       optionsfrequency: [
         "Horario",
@@ -453,13 +510,19 @@ export default {
       optionsmoney: [],
       optionseditdate: ["Variable", "Fija"],
       //Validaciones
+      projectMonitoringRule: [
+        (v) => !!v || "El proyecto monitoreo ambiental es requerido.",
+      ],
+      phaseRule: [(v) => !!v || "La fase es requeria."],
+      programRule: [(v) => !!v || "El programa es requerido."],
       obligationRule: [(v) => !!v || "La obligación es requerida."],
+      mediumsRule: [(v) => !!v || "El medio es requerida."],
       /* dateInitialRules: [
         (v) =>
           v >= today ||
           "La fecha final tiene que ser mayor a la fecha actual " + today + ".",
       ], */
-     /*  dateFinalRules: [
+      /*  dateFinalRules: [
         (v) =>
           v > this.startdate ||
           "La fecha final tiene que ser mayor de la fecha inicial.",
@@ -468,14 +531,131 @@ export default {
   },
   methods: {
     ...mapActions({
+      GetProgram: "parameters/GetProgram",
       GetTool: "parameters/GetTool",
+      GetAddress: "parameters/GetAddress",
+      GetAxios: "parameters/GetAxios",
+      GetMedium: "parameters/GetMedium",
       StorePost: "parameters/PostAxios",
     }),
+    /* Consulta los proyectos por el programa seleccionado */
+    listProject(id) {
+      this.optionsproject = [];
+      this.StorePost({
+        context: "get_projects_by_programs",
+        data: { id_program: id },
+      }).then((response) => {
+        response.data.projects.forEach((element) => {
+          this.optionsproject.push({
+            label: element.name.toString(),
+            id: element.id.toString(),
+          });
+        });
+      });
+    },
+    //Filtros de select
+    filtermediums(val, update) {
+      if (val === "") {
+        update(() => {
+          this.optionmediums = stringmediumsOptions[0];
+        });
+        return;
+      }
+      update(() => {
+        const needle = val.toLowerCase();
+        this.optionmediums = stringmediumsOptions[0].filter(
+          (v) => v.value.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
+    filterTool(val, update) {
+      if (val === "") {
+        update(() => {
+          this.optionsobligation = stringToolOptions[0];
+        });
+        return;
+      }
+      update(() => {
+        const needle = val.toLowerCase();
+        this.optionsobligation = stringToolOptions[0].filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
+    filterProjectMonitoring(val, update) {
+      if (val === "") {
+        update(() => {
+          this.optionsprojectMonitoring = stringProjectMonitoringOptions;
+        });
+        return;
+      }
+      update(() => {
+        const needle = val.toLowerCase();
+        this.optionsprojectMonitoring = stringProjectMonitoringOptions.filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
+    filterProgram(val, update) {
+      if (val === "") {
+        update(() => {
+          this.options_program = stringProgramOptions[0];
+        });
+        return;
+      }
+      update(() => {
+        const needle = val.toLowerCase();
+        this.options_program = stringProgramOptions[0].filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
+    filterProject(val, update) {
+      if (val === "") {
+        update(() => {
+          this.optionsproject = stringProjectOptions;
+        });
+        return;
+      }
+      update(() => {
+        const needle = val.toLowerCase();
+        this.optionsproject = stringProjectOptions.filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
+    filterAddress(val, update) {
+      if (val === "") {
+        update(() => {
+          this.optionsAddress = stringAddressOptions[0];
+        });
+        return;
+      }
+      update(() => {
+        const needle = val.toLowerCase();
+        this.optionsAddress = stringAddressOptions[0].filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
+    filterResponsable(val, update) {
+      if (val === "") {
+        update(() => {
+          this.optionsresponsable = stringResponsableOptions;
+        });
+        return;
+      }
+      update(() => {
+        const needle = val.toLowerCase();
+        this.optionsresponsable = stringResponsableOptions.filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
     /* Consulta los usuarios una vez seleccione la sede */
     UserbyAddress() {
       var data = { id_address: this.address.id };
-      this.$axios
-        .post("http://127.0.0.1:8000/api/get_users_by_address", data)
+      this.StorePost({ context: "get_users_by_address", data: data })
         .then((response) => {
           response.data.forEach((element) => {
             this.optionsresponsable.push({
@@ -484,7 +664,6 @@ export default {
               id: element.id.toString(),
             });
           });
-          stringResponsableOptions = this.optionsresponsable;
         })
         .catch((e) => {
           console.log(e);
@@ -536,57 +715,13 @@ export default {
       this.money = null;
       this.loading = false;
     },
-    //Filtros de select
-    filterTool(val, update) {
-      if (val === "") {
-        update(() => {
-          this.optionsobligation = stringToolOptions[0];
-        });
-        return;
-      }
-      update(() => {
-        const needle = val.toLowerCase();
-        this.optionsobligation = stringToolOptions[0].filter(
-          (v) => v.label.toLowerCase().indexOf(needle) > -1
-        );
-      });
-    },
-    filterAddress(val, update) {
-      update(() => {
-        this.optionsAddress = this.filter(
-          val,
-          this.optionsAddress,
-          stringAddressOptions
-        );
-      });
-    },
-    filterResponsable(val, update) {
-      update(() => {
-        this.optionsresponsable = this.filter(
-          val,
-          this.optionsresponsable,
-          stringResponsableOptions
-        );
-      });
-    },
-    filter(val, options, stringOptions) {
-      var options_data = options;
-      if (val === "") {
-        options_data = stringOptions;
-      } else {
-        const needle = val.toLowerCase();
-        options_data = stringOptions.filter(
-          (v) => v.value.toLowerCase().indexOf(needle) > -1
-        );
-      }
-      return options_data;
-    },
+
     /* Registrar oblicación */
     submit() {
       var data = {
+        phase: this.phase,
+        enviorenmental_monitoring: this.projectMonitoring.id,
         id_tool: this.obligation.id,
-        tool_label: this.obligation.label,
-        code: this.code,
         name: this.name,
         objetive: this.objetive,
         target: this.goal,
@@ -594,63 +729,59 @@ export default {
         indicator: this.rowsIndicator,
         activity: this.rowsActivity,
       };
+      data.group = this.project != null ? "project" : "program";
+      data.id_group = this.project != null ? this.project.id : this.program.id;
       this.StorePost({
-        context: "http://127.0.0.1:8000/api/create_worksheets",
+        context: "create_worksheets",
         data: data,
       }).then((response) => {
-        this.StorePost({
-          context: "http://127.0.0.1:8000/api/getCellByExcel",
-          data: response.data,
-        }).then((response) => {
-          console.log(response);
-        });
+        this.$emit("new");
       });
-      /* this.$emit("new", data); */
     },
   },
   mounted() {
     /* Vaciar los select del componente*/
     this.optionsmoney = [];
-    stringAddressOptions = [];
-    /*Trae las monedas registradas*/
-    this.$axios
-      .get("http://127.0.0.1:8000/api/get_currencies")
-      .then((response) => {
-        response.data.forEach((element) => {
-          this.optionsmoney.push({
-            label: element.currency.toString(),
-            value: element.currency,
-            id: element.id.toString(),
-          });
+
+    this.GetAxios({
+      context: "get_projects",
+    }).then((response) => {
+      response.data.forEach((element) => {
+        this.optionsprojectMonitoring.push({
+          label: element.project.toString(),
+          id: element.id.toString(),
         });
-      })
-      .catch((e) => {
-        console.log(e);
       });
+    });
+    /*Trae las monedas registradas*/
+    this.GetAxios({
+      context: "get_currencies",
+    }).then((response) => {
+      response.data.forEach((element) => {
+        this.optionsmoney.push({
+          label: element.currency.toString(),
+          value: element.currency,
+          id: element.id.toString(),
+        });
+      });
+    });
+
     /*Trae las obligaciones*/
     this.GetTool().then((response) => {
       stringToolOptions.push(response);
     });
-
+    /* llenar select programas */
+    this.GetProgram().then((response) => {
+      stringProgramOptions.push(response);
+    });
+    /* Fin llenar select programas */
+    this.GetMedium().then((response) => {
+      stringmediumsOptions.push(response);
+    });
     /*Trae las sedes del usuario logueado*/
-    var data = {
-      id_user: this.$q.localStorage.getItem("USER"),
-    };
-    this.$axios
-      .post("http://127.0.0.1:8000/api/get_address_by_users", data)
-      .then((response) => {
-        response.data.address.forEach((element) => {
-          stringAddressOptions.push({
-            label: element.name.toString(),
-            value: element.name,
-            id: element.id_address.toString(),
-          });
-        });
-        this.optionsAddress = stringAddressOptions;
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    this.GetAddress().then((response) => {
+      stringAddressOptions.push(response);
+    });
   },
 };
 </script>

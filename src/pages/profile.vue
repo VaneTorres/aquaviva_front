@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-sm">
+  <q-page class="q-pa-sm" v-if="info">
     <div class="row q-col-gutter-sm">
       <div class="col-lg-8 col-md-8 col-xs-12 col-sm-12">
         <q-card class="card-bg">
@@ -13,7 +13,8 @@
                 <q-item-section>
                   <q-input
                     dense
-                    v-model="typedocument"
+                    disable
+                    v-model="info.document_type"
                     label="Tipo de documento"
                   />
                 </q-item-section>
@@ -22,7 +23,8 @@
                 <q-item-section>
                   <q-input
                     dense
-                    v-model="document"
+                    disable
+                    v-model="info.document"
                     label="Número de documento"
                   />
                 </q-item-section>
@@ -31,19 +33,27 @@
                 <q-item-section>
                   <q-input
                     dense
-                    v-model="name"
+                    v-model="info.name"
                     label="Nombre(s) y apellido(s)"
                   />
                 </q-item-section>
               </q-item>
               <q-item class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                 <q-item-section>
-                  <q-input dense v-model="cel" label="Número de celular" />
+                  <q-input
+                    dense
+                    v-model="info.mobile"
+                    label="Número de celular"
+                  />
                 </q-item-section>
               </q-item>
               <q-item class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                 <q-item-section>
-                  <q-input dense v-model="email" label="Correo electrónico" />
+                  <q-input
+                    dense
+                    v-model="info.email"
+                    label="Correo electrónico"
+                  />
                 </q-item-section>
               </q-item>
               <q-item class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
@@ -76,6 +86,10 @@
       <div class="col-lg-4 col-md-4 col-xs-12 col-sm-12">
         <q-card class="card-bg">
           <q-card-section class="text-center">
+            <div class="text-h6">Sede</div>
+            <div class="text-subtitle2">{{ info.address }}</div>
+          </q-card-section>
+          <q-card-section class="text-center">
             <div class="text-h6">Departamento</div>
             <div class="text-subtitle2">CEO</div>
           </q-card-section>
@@ -89,17 +103,26 @@
   </q-page>
 </template>
 <script>
+import { mapActions } from "vuex";
 export default {
   data() {
     return {
-      name: null,
-      document: null,
-      typedocument: null,
-      cel: null,
-      email: null,
-      password: null,
-      password_confirm: null,
+      info: null,
     };
+  },
+  methods: {
+    ...mapActions({
+      GetAxios: "parameters/GetAxios",
+      StorePost: "parameters/PostAxios",
+    }),
+    getinfo() {
+      this.GetAxios({ context: "user" }).then((respose) => {
+        this.info = respose.data;
+      });
+    },
+  },
+  mounted() {
+    this.getinfo();
   },
 };
 </script>

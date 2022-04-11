@@ -15,7 +15,7 @@
             round
             color="primary"
             icon="add"
-            @click="fixed = true"
+            @click="newCompany = true"
           />
           <q-space />
           <q-input
@@ -38,7 +38,7 @@
               no-caps
               flat
               dense
-              @click="seeCompany(props.row.id)"
+              @click="modalCompany(props.row.id_company, 'view')"
             >
               <q-tooltip>Ver detalles </q-tooltip>
             </q-btn>
@@ -48,7 +48,7 @@
               no-caps
               flat
               dense
-              @click="editCompany(props.row.id)"
+              @click="modalCompany(props.row.id_company, 'edit')"
             >
               <q-tooltip>Editar </q-tooltip>
             </q-btn>
@@ -57,7 +57,7 @@
       </q-table>
       <!-- Fin tabla de las compañias registradas -->
       <!-- Modal nueva compañia -->
-      <q-dialog v-model="fixed">
+      <q-dialog v-model="newCompany">
         <NewCompany @new="UpdateListCompany" />
       </q-dialog>
       <!-- Fin modal nueva compañia -->
@@ -68,7 +68,7 @@
       <!-- Fin modal ver compañia -->
       <!-- Modal edit compañia -->
       <q-dialog v-model="edit">
-        <EditCompany :id="id_company" @update="UpdateListCompany"/>
+        <EditCompany :id="id_company" @update="UpdateListCompany" />
       </q-dialog>
       <!-- Fin modal edit compañia -->
     </div>
@@ -89,28 +89,28 @@ const columns = [
     required: true,
     label: "NIT",
     align: "center",
-    field: (row) => row.name,
+    field: (row) => row.nit,
     format: (val) => `${val}`,
     sortable: true,
   },
   {
-    name: "code_ciiu",
+    name: "ciiu",
     align: "center",
     label: "CÓDIGO CIIU ",
-    field: "code_ciiu",
+    field: "ciiu",
     sortable: true,
   },
   {
-    name: "decription_ciiu",
+    name: "description",
     align: "center",
     label: "DESCRIPCION CIIU",
-    field: "decription_ciiu",
+    style:
+      "max-width:5px; white-space: pre-wrap;  white-space: -moz-pre-wrap;  white-space: -pre-wrap;   white-space: -o-pre-wrap;  word-wrap: break-word; ",
+    field: "description",
     sortable: true,
   },
   { name: "action", label: "ACCIÓN", field: "action", align: "center" },
 ];
-
-const originalRows = [];
 
 export default {
   /* Componentes */
@@ -123,57 +123,43 @@ export default {
   /* Datos */
   data() {
     return {
-      fixed: false,
+      newCompany: false,
       view: false,
       edit: false,
       id_company: null,
       columns,
-      rows: originalRows,
+      rows: [],
       loading: false,
       filter: "",
       rowCount: 20,
     };
   },
   methods: {
+    /* Vuex */
     ...mapActions({
       StoreGet: "parameters/GetAxios",
     }),
-    /* Consulta la compañia */
-    seeCompany(id) {
-      this.id_company = id ;
-      this.view = true;
-    },
-    /* Editar la compañia */
-    editCompany(id) {
-      this.id_company = id ;
-      this.edit = true;
+    /* Modal de ver o editar de la compañia */
+    modalCompany(id, action) {
+      this.id_company = id;
+      action == "view" ? (this.view = true) : (this.edit = true);
     },
     /* Cierra el modal de la compañia */
     UpdateListCompany() {
-      this.fixed = false;
+      this.newCompany = false;
       this.edit = false;
       this.listCompany();
     },
     /* Tre la lista de las compañias creadas */
     listCompany() {
       this.rows = [];
+      this.loading = true;
       this.StoreGet({
-        context: "http://127.0.0.1:8000/api/company_list",
-      })
-        .then((response) => {
-          response.data.forEach((element) => {
-            this.rows.push({
-              name: element.nit,
-              logo: element.logo,
-              code_ciiu: element.ciiu,
-              decription_ciiu: element.description,
-              id: element.id_company,
-            });
-          });
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+        context: "company_list",
+      }).then((response) => {
+        this.loading = false;
+        this.rows = response.data;
+      });
     },
   },
   created() {

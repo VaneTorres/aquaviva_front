@@ -1,7 +1,7 @@
 <template>
   <q-card>
     <q-card-section class="row items-center q-pb-none">
-      <div class="text-h6">AGREGAR SEGUIMIENTO AMBIENTAL</div>
+      <div class="text-h6">AGREGAR PROYECTO DE LA ORGANIZACIÓN</div>
       <q-space />
       <q-btn icon="close" flat round dense v-close-popup />
     </q-card-section>
@@ -13,13 +13,24 @@
         class="text-center"
         @submit.prevent="registerEnviorenmentalMonitore"
       >
-        <div class="row">
+        <div class="row q-col-gutter-sm">
+          <q-select
+            use-input
+            :rules="addresRule"
+            input-debounce="0"
+            @filter="filterAddress"
+            v-model="address"
+            :options="options_address"
+            label="Sede *"
+            class="col-md-6 col-12"
+            color="primary"
+          />
           <q-input
             v-model="project"
             :rules="projectNameRules"
             type="text"
-            class="col-md-6 q-pa-sm"
-            label="Proyecto"
+            class="col-md-6 col-12"
+            label="Proyecto de la organización*"
           />
           <q-select
             use-input
@@ -28,27 +39,16 @@
             @filter="filterTown"
             v-model="town"
             :options="options_town"
-            label="Municipio"
-            class="col-md-6 q-pa-sm"
+            label="Municipio *"
+            class="col-md-6 col-12"
             color="primary"
           />
           <q-input
             v-model="ubication"
             :rules="ubicationNameRules"
             type="text"
-            class="col-md-6 q-pa-sm"
-            label="Ubicación"
-          />
-          <q-select
-            use-input
-            :rules="toolRule"
-            input-debounce="0"
-            @filter="filterTool"
-            v-model="tool"
-            :options="options_tools"
-            label="Instrumento ambiental"
-            class="col-md-6 q-pa-sm"
-            color="primary"
+            class="col-md-6 col-12"
+            label="Ubicación *"
           />
           <q-select
             use-input
@@ -57,26 +57,41 @@
             @filter="filterAuthority"
             v-model="authority"
             :options="options_authority"
-            label="Autoridad ambiental"
-            class="col-md-6 q-pa-sm"
+            label="Autoridad ambiental *"
+            class="col-md-6 col-12"
             color="primary"
           />
+          <div class="row">
+            <q-checkbox
+              :rules="toolRule"
+              class="col-md-6 col-12"
+              v-for="(item, index) in options_tools"
+              :key="index"
+              v-model="tool"
+              :label="item.label"
+              :value="item.id"
+            />
+          </div>
+          {{ tool }}
         </div>
-        <q-btn color="primary" type="submit" label="Enviar" form="formAddress" />
+        <q-btn
+          class="q-my-md float-right"
+          color="primary"
+          type="submit"
+          label="Enviar"
+          form="formAddress"
+        />
       </q-form>
     </q-card-section>
   </q-card>
 </template>
 <script>
+import { mapActions } from "vuex";
 const stringAuthorityOptions = [];
 const stringToolOptions = [];
 const stringTownOptions = [];
+const stringAddressOptions = [];
 export default {
-  props: {
-    id_company: {
-      type: Number,
-    },
-  },
   data() {
     return {
       //MODEL-VALUE
@@ -84,70 +99,77 @@ export default {
       town: null,
       ubication: null,
       authority: null,
-      tool: null,
+      address: null,
+      tool: [],
       valid: true,
-      optionsfrequency: [
-        "Diaria",
-        "Semanal",
-        "Mensual",
-        "Bimestal",
-        "Trimestal",
-        "Semestral",
-        "Anual",
-      ],
       options_authority: stringAuthorityOptions,
       options_tools: stringToolOptions,
       options_town: stringTownOptions,
+      options_address: stringAddressOptions,
       //VALIDATE
+      addresRule: [(v) => !!v || "La sede es requerida."],
+      projectNameRules: [(v) => !!v || "El proyecto es requerido."],
       townRule: [(v) => !!v || "El municipio es requerido."],
-      ubicationRule: [
+      authorityRule: [(v) => !!v || "La autoridad ambiental es requerida."],
+      toolRule: [(v) => !!v || "El instrumento ambiental es requerido."],
+      ubicationNameRules: [
         (v) => !!v || "La especificación de la ubicación es requerida.",
-      ],
-      addressNameRules: [(v) => !!v || "El nombre de la sede es requerida."],
-      descriptionRules: [
-        (v) => !!v || "La descripción de la sede es requerida.",
       ],
     };
   },
   methods: {
+    ...mapActions({
+      GetTown: "parameters/GetTown",
+      GetTool: "parameters/GetTool",
+      GetAddress: "parameters/GetAddress",
+      GetAxios: "parameters/GetAxios",
+      StorePost: "parameters/PostAxios",
+    }),
     registerEnviorenmentalMonitore() {
-      var id_user=this.$q.localStorage.getItem("USER")
+      var id_user = this.$q.localStorage.getItem("USER");
       var data = {
-        id_user:id_user,
+        id_user: id_user,
         project: this.project,
         id_town: this.town.id,
-        town:this.town.label,
         especification: this.ubication,
         id_authority: this.authority.id,
-        authority:this.authority.label,
         id_tool: this.tool.id,
-        tool: this.tool.label,
+        id_address: this.address.id,
       };
-      this.$axios
-        .post("http://127.0.0.1:8000/api/store_project", data)
-        .then((response) => {
-          this.$emit("new", data);
-       this.$q.notify({
-              message:
-                "Se ha registrado correctamente.",
-              type: "positive",
-            });
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      this.StorePost({
+        context: "store_project",
+        data: data,
+      }).then(() => {
+        this.$emit("new");
+      });
     },
     //FILTRO DEL SELECT
-    filterTown(val, update) {
+    filterAddress(val, update) {
       if (val === "") {
         update(() => {
-          this.options_town = stringTownOptions;
+          this.options_address = stringAddressOptions[0];
         });
         return;
       }
+
       update(() => {
         const needle = val.toLowerCase();
-        this.options_town = stringTownOptions.filter(
+        this.options_address = stringAddressOptions[0].filter(
+          (v) => v.value.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    },
+    filterTown(val, update) {
+      if (val === "") {
+        update(() => {
+          this.options_town = stringTownOptions[0];
+        });
+        return;
+      }
+
+      update(() => {
+        const needle = val.toLowerCase();
+        this.options_town = stringTownOptions[0].filter(
           (v) => v.value.toLowerCase().indexOf(needle) > -1
         );
       });
@@ -162,102 +184,40 @@ export default {
       update(() => {
         const needle = val.toLowerCase();
         this.options_authority = stringAuthorityOptions.filter(
-          (v) => v.value.toLowerCase().indexOf(needle) > -1
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
         );
       });
-    },
-    filterTool(val, update) {
-      if (val === "") {
-        update(() => {
-          this.options_tools = stringToolOptions;
-        });
-        return;
-      }
-      update(() => {
-        const needle = val.toLowerCase();
-        this.options_tools = stringToolOptions.filter(
-          (v) => v.value.toLowerCase().indexOf(needle) > -1
-        );
-      });
-    },
-    //REGISTRO DE SELECT
-    registerAddress() {
-      var data = {
-        id_company: this.id_company,
-        addressName: this.addressName,
-        address: this.address,
-        phone: this.phone,
-        contact: this.contact,
-        description: this.description,
-        town: this.town.id,
-        town_name: this.town.label,
-        type_address: "Secundaria",
-      };
-
-      this.$axios
-        .post("http://127.0.0.1:8000/api/store_address", data)
-        .then((response) => {
-          this.$emit("new", data);
-          this.$q.notify({
-            message: "Se ha registrado correctamente.",
-            type: "positive",
-          });
-        })
-        .catch((e) => {
-          console.log(e);
-        });
     },
   },
-  mounted() {
-    var data = {
-      id_user: this.$q.localStorage.getItem("USER"),
-    };
+  created() {
     //CONSULTAR LOS MUNICIPIOS
-    this.$axios
-      .get("http://127.0.0.1:8000/api/get_towns")
-      .then((response) => {
-        response.data.forEach((element) => {
-          this.options_town.push({
-            label: element.town.toString(),
-            value: element.town,
-            id: element.id.toString(),
-          });
+    /* llenar select municipios */
+    this.GetTown().then((response) => {
+      stringTownOptions.push(response);
+    });
+    /* Fin llenar select municipios */
+    /* llenar select sedes */
+    this.GetAddress().then((response) => {
+      stringAddressOptions.push(response);
+    });
+    /* Fin llenar select sedes */
+    /* llenar select intrumento ambiental */
+    this.GetTool().then((response) => {
+      this.options_tools = response;
+    });
+    /* Fin llenar select intrumento ambiental */
+    this.GetAxios({
+      context: "get_authorities",
+    }).then((response) => {
+      stringAuthorityOptions.length = 0;
+      response.data.forEach((element) => {
+        this.options_authority.push({
+          label: element.authority.toString(),
+          id: element.id.toString(),
         });
-        stringTownOptions = this.options_town;
-      })
-      .catch((e) => {
-        console.log(e);
       });
-    this.$axios
-      .get("http://127.0.0.1:8000/api/get_tools")
-      .then((response) => {
-        response.data.forEach((element) => {
-          this.options_tools.push({
-            label: element.tool.toString(),
-            value: element.tool,
-            id: element.id.toString(),
-          });
-        });
-        stringToolOptions = this.options_tools;
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-    this.$axios
-      .get("http://127.0.0.1:8000/api/get_authorities")
-      .then((response) => {
-        response.data.forEach((element) => {
-          this.options_authority.push({
-            label: element.authority.toString(),
-            value: element.authority,
-            id: element.id.toString(),
-          });
-        });
-        stringAuthorityOptions = this.options_authority;
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+      this.options_authority = stringAuthorityOptions;
+    });
   },
 };
 </script>

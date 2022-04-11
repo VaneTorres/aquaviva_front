@@ -1,4 +1,3 @@
-
 const routes = [
   {
     path: "/",
@@ -55,13 +54,23 @@ const routes = [
         name: "environmental_monitored",
       },
       {
-        path: "load_of_obligations",
+        path: "load_of_obligations/obligation",
         component: () => import("src/pages/load_of_obligations/obligation.vue"),
-        name: "pma",
+        name: "obligation",
       },
       {
-        path: "program",
-        component: () => import("src/pages/program.vue"),
+        path: "load_of_obligations/evidence",
+        component: () => import("src/pages/evidence.vue"),
+        name: "evidence",
+      },
+      {
+        path: "parameterize/project",
+        component: () => import("src/pages/parameterize/project.vue"),
+        name: "project",
+      },
+      {
+        path: "parameterize/program",
+        component: () => import("src/pages/parameterize/program.vue"),
         name: "program",
       },
       {

@@ -10,9 +10,10 @@
           <q-separator inset></q-separator>
           <q-card-section>
             <q-list>
-              <q-item>
+              <q-item class="fit row inline justify-center">
                 <q-item-section>
                   <q-img
+                    :ratio="16 / 9"
                     :src="
                       data.logo != null
                         ? 'http://localhost:8000/img/companies/' + data.logo
@@ -64,12 +65,18 @@
                   color="primary"
                   icon="add"
                   @click="newaddress = true"
+                  v-if="permissions.includes('Crear sede')"
                 />
               </div>
             </div>
           </q-card-section>
           <q-separator inset></q-separator>
-          <q-table :rows="rows" :columns="columns" row-key="name" />
+          <q-table
+            :rows="rows"
+            :columns="columns"
+            row-key="name"
+            :loading="loading"
+          />
           <q-card-section> </q-card-section>
         </q-card>
       </div>
@@ -109,6 +116,8 @@ const columns = [
     name: "address",
     align: "center",
     label: "DIRECCIÓN DE LA SEDE",
+    style:
+      "max-width:5px; white-space: pre-wrap;  white-space: -moz-pre-wrap;  white-space: -pre-wrap;   white-space: -o-pre-wrap;  word-wrap: break-word; ",
     field: "address",
     sortable: true,
   },
@@ -148,8 +157,10 @@ export default {
   data() {
     return {
       newaddress: false,
+      loading: false,
       columns,
       id_company: null,
+      permissions: [],
       data: {
         ciiu: null,
         ciiu_description: null,
@@ -159,25 +170,21 @@ export default {
     };
   },
   methods: {
-    /* VUEZ */
+    /* VUEX */
     ...mapActions({
-      StorePost: "parameters/PostAxios",
+      GetAxios: "parameters/GetAxios",
     }),
     /* REGISTRAR SEDE */
-    registerAddress(info) {
+    registerAddress() {
       this.newaddress = false;
       this.dataCompany();
     },
     /* CONSULTAR INFORMACIÓN DE LA EMPRESA Y SUS SEDES */
     dataCompany() {
       this.rows = [];
-      var data = {
-        id_user: this.$q.localStorage.getItem("USER"),
-      };
-      this.StorePost({
-        context: "http://127.0.0.1:8000/api/get_address_by_users",
-        data,
-      }).then((response) => {
+      this.loading = true;
+      this.GetAxios({ context: "get_address_by_users" }).then((response) => {
+        this.loading = false;
         this.id_company = response.data.company.id_company;
         this.data = {
           ciiu: response.data.company.ciiu,
@@ -200,6 +207,7 @@ export default {
     },
   },
   mounted() {
+    this.permissions = this.$q.localStorage.getItem("PERMISSIONS");
     this.dataCompany();
   },
 };

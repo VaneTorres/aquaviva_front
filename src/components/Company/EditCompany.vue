@@ -86,7 +86,7 @@
                   color="primary"
                   label="Enviar"
                   form="formCompany"
-                  class="q-mt-md"
+                  class="q-mt-md float-right"
                 />
               </q-form>
             </q-tab-panel>
@@ -152,7 +152,7 @@
                   color="primary"
                   label="Enviar"
                   form="formAddress"
-                  class="q-mt-md"
+                  class="q-mt-md float-right"
                 />
               </q-form>
             </q-tab-panel>
@@ -207,7 +207,7 @@
                   color="primary"
                   label="Enviar"
                   form="formAdmin"
-                  class="q-mt-md"
+                  class="q-mt-md float-right"
                 />
               </q-form>
             </q-tab-panel>
@@ -246,12 +246,6 @@ export default {
       phoneRules: [
         (v) => !!v || "El teléfono de la sede es requerido.",
         (v) =>
-          v.length <= 10 ||
-          "El teléfono de la sede debe de ser máximo de 10 caracteres.",
-        (v) =>
-          v.length >= 7 ||
-          "El teléfono de la sede debe de ser mínimo de 7 caracteres.",
-        (v) =>
           /^[0-9]+$/i.test(v) || "El teléfono de la sede no debe tener letras.",
       ],
       contactRules: [(v) => !!v || "El responsable es requerido."],
@@ -264,12 +258,6 @@ export default {
       mobileRules: [
         (v) => !!v || "El número de celular es requerido.",
         (v) =>
-          v.length <= 10 ||
-          "El número de celular debe de ser máximo de 10 caracteres.",
-        (v) =>
-          v.length >= 7 ||
-          "El número de celular debe de ser mínimo de 7 caracteres.",
-        (v) =>
           /^[0-9]+$/i.test(v) || "El número de celular no debe tener letras",
       ],
       emailRules: [
@@ -281,7 +269,7 @@ export default {
       ],
     };
   },
-  
+
   methods: {
     /* VUEX */
     ...mapActions({
@@ -318,7 +306,7 @@ export default {
         const needle = val.toLowerCase();
         if (!isNaN(needle)) {
           this.options_ciiu = stringCiiuOptions[0].filter(
-            (v) => v.value.toLowerCase().indexOf(needle) > -1
+            (v) => v.label.toLowerCase().indexOf(needle) > -1
           );
         } else {
           this.options_ciiu = stringCiiuOptions[0].filter(
@@ -338,7 +326,7 @@ export default {
       update(() => {
         const needle = val.toLowerCase();
         this.options_town = stringTownOptions[0].filter(
-          (v) => v.value.toLowerCase().indexOf(needle) > -1
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
         );
       });
     },
@@ -349,9 +337,9 @@ export default {
       data.append("codeCiiu", this.info.ciiu.id);
       data.append("id_company", this.info.id_company);
       this.StorePost({
-        context: "http://127.0.0.1:8000/api/update_company",
+        context: "update_company",
         data: data,
-      }).then((response) => {
+      }).then(() => {
         this.$emit("update");
       });
     },
@@ -366,9 +354,9 @@ export default {
         contact_person: this.info.contact_person,
       };
       this.StorePost({
-        context: "http://127.0.0.1:8000/api/update_address",
+        context: "update_address",
         data: data,
-      }).then((response) => {
+      }).then(() => {
         this.$emit("update");
       });
     },
@@ -382,9 +370,9 @@ export default {
         mobile: this.info.admin.mobile,
       };
       this.StorePost({
-        context: "http://127.0.0.1:8000/api/update_user",
+        context: "update_user_admin",
         data: data,
-      }).then((response) => {
+      }).then(() => {
         this.$emit("update");
       });
     },
@@ -392,44 +380,28 @@ export default {
   mounted() {
     /* Consulta api de información de la compañia */
     this.StorePost({
-      context: "http://127.0.0.1:8000/api/company_show",
+      context: "company_show",
       data: { id_company: this.id },
     }).then((response) => {
       var companyArray = response.data.company[0];
-      this.info = {
-        logo: companyArray.logo,
-        nit: companyArray.nit,
-        ciiu: { id: companyArray.id_ciiu, label: companyArray.ciiu },
-        id_company: companyArray.id_company,
-        id_address: companyArray.id_address,
-        name_sede: companyArray.name_sede,
-        address: companyArray.address,
-        address_description: companyArray.address_description,
-        town: { id: companyArray.id_town, label: companyArray.town },
-        phone: companyArray.phone,
-        contact_person: companyArray.contact_person,
+      this.info = companyArray;
+      this.info.ciiu = {
+        id: companyArray.id_ciiu,
+        label: companyArray.ciiu,
+        description: companyArray.ciiu_description,
       };
-      this.info.admin = {
-        id_user: response.data.admin.id_user,
-        document: response.data.admin.document,
-        email: response.data.admin.email,
-        name: response.data.admin.name,
-        mobile: response.data.admin.mobile,
-        document_type: {
-          id: response.data.admin.id_document_type,
-          label: response.data.admin.type,
-        },
+      this.info.town = { id: companyArray.id_town, label: companyArray.town };
+      this.info.admin = response.data.admin;
+      this.info.admin.document_type = {
+        id: response.data.admin.id_document_type,
+        label: response.data.admin.type,
       };
     });
     /* Fin consulta api de información de la compañia */
     /* Llenar select Ciiu */
-    this.GetCiiu()
-      .then((response) => {
-        stringCiiuOptions.push(response);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    this.GetCiiu().then((response) => {
+      stringCiiuOptions.push(response);
+    });
     /* Fin llenar select Ciiu */
     /* llenar select municipios */
     this.GetTown().then((response) => {

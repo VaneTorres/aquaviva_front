@@ -14,7 +14,8 @@
             round
             color="primary"
             icon="add"
-            @click="newMonitoring = true"
+            @click="fixed = true"
+            v-if="permissions.includes('Crear programa')"
           />
           <q-space />
           <q-input
@@ -30,47 +31,40 @@
           </q-input>
         </template>
       </q-table>
-      <q-dialog v-model="newMonitoring">
-        <NewMonitoring v-on:new="registerMonitoring" />
+      <q-dialog v-model="fixed">
+        <NewProgram @new="registerPrograms" />
       </q-dialog>
     </div>
   </q-page>
 </template>
 
 <script>
-import NewMonitoring from "src/components/NewMonitoring.vue";
+/* Componentes de ver y nuevo */
+import NewProgram from "src/components/parameterize/NewProgram.vue";
 import { mapActions } from "vuex";
+/* Columnas de las tablas */
 const columns = [
   {
-    name: "project",
+    name: "medium",
     required: true,
-    label: "PROYECTO DE LA ORGANIZACIÓN",
+    label: "MEDIO",
     align: "center",
-    field: (row) => row.project,
+    field: (row) => row.medium,
     format: (val) => `${val}`,
     sortable: true,
   },
   {
-    name: "authority",
+    name: "code",
     align: "center",
-    label: "AUTORIDAD AMBIENTAL",
-    style:
-      "max-width:5px; white-space: pre-wrap;  white-space: -moz-pre-wrap;  white-space: -pre-wrap;   white-space: -o-pre-wrap;  word-wrap: break-word; ",
-    field: "authority",
+    label: "CODIGO",
+    field: "code",
     sortable: true,
   },
   {
-    name: "town",
+    name: "label",
     align: "center",
-    label: "MUNICIPIO",
-    field: "town",
-    sortable: true,
-  },
-  {
-    name: "especification",
-    align: "center",
-    label: "UBICACIÓN",
-    field: "especification",
+    label: "NOMBRE",
+    field: "label",
     sortable: true,
   },
 ];
@@ -79,11 +73,12 @@ const originalRows = [];
 
 export default {
   components: {
-    NewMonitoring,
+    NewProgram,
   },
   data() {
     return {
-      newMonitoring: false,
+      fixed: false,
+      permissions: [],
       columns,
       rows: originalRows,
       loading: false,
@@ -93,25 +88,24 @@ export default {
   },
   methods: {
     ...mapActions({
-      StoreGet: "parameters/GetAxios",
+      GetProgram: "parameters/GetProgram",
     }),
-    registerMonitoring() {
-      this.newMonitoring = false;
-      this.UpdateList();
+    registerPrograms() {
+      this.fixed = false;
+      this.listPrograms();
     },
-    UpdateList() {
+    listPrograms() {
       this.loading = true;
-      this.StoreGet({
-        context: "get_projects",
-      }).then((response) => {
-        this.rows = response.data;
+      this.rows = [];
+      this.GetProgram().then((response) => {
+        this.rows = response;
         this.loading = false;
       });
     },
   },
-
-  created() {
-    this.UpdateList();
+  mounted() {
+    this.permissions = this.$q.localStorage.getItem("PERMISSIONS");
+    this.listPrograms();
   },
 };
 </script>

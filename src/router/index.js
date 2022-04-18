@@ -1,6 +1,11 @@
-import { route } from 'quasar/wrappers'
-import { createRouter, createMemoryHistory, createWebHistory, createWebHashHistory } from 'vue-router'
-import routes from './routes'
+import { route } from "quasar/wrappers";
+import {
+  createRouter,
+  createMemoryHistory,
+  createWebHistory,
+  createWebHashHistory,
+} from "vue-router";
+import routes from "./routes";
 /*
  * If not building with SSR mode, you can
  * directly export the Router instantiation;
@@ -10,11 +15,12 @@ import routes from './routes'
  * with the Router instance.
  */
 
-export default route(function ({store}/* { store, ssrContext } */) {
-  
+export default route(function ({ store } /* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
-    : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
+    : process.env.VUE_ROUTER_MODE === "history"
+    ? createWebHistory
+    : createWebHashHistory;
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
@@ -23,18 +29,21 @@ export default route(function ({store}/* { store, ssrContext } */) {
     // Leave this as is and make changes in quasar.conf.js instead!
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
-    history: createHistory(process.env.MODE === 'ssr' ? void 0 : process.env.VUE_ROUTER_BASE)
-  })
-  
+    history: createHistory(
+      process.env.MODE === "ssr" ? void 0 : process.env.VUE_ROUTER_BASE
+    ),
+  });
+
   Router.beforeEach((to, from, next) => {
-    store.commit('parameters/SET_TOKEN', localStorage.getItem('TOKEN'));
-    if (to.matched.some(route => route.meta.requireAuth) && !store.getters['parameters/authenticated']) {
-      next({ name: 'login' })
+    store.commit("parameters/SET_TOKEN", localStorage.getItem("TOKEN"));
+    if (
+      to.matched.some((route) => route.meta.requireAuth) &&
+      !store.getters["parameters/authenticated"]
+    ) {
+      next({ name: "login" });
     } else {
-     
-        next()
+      next();
     }
-   
-  })
-  return Router
-})
+  });
+  return Router;
+});

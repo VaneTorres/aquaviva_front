@@ -96,7 +96,7 @@
 <script>
 const stringProjectOptions = [];
 const stringMediumOptions = [];
-const stringComponentOptions=[];
+const stringComponentOptions = [];
 const columns = [
   {
     name: "nombre_sede",
@@ -142,7 +142,7 @@ export default {
       columns,
       options_project: stringProjectOptions,
       options_medium: stringMediumOptions,
-      options_component:stringComponentOptions,
+      options_component: stringComponentOptions,
       medium: null,
       project: null,
     };

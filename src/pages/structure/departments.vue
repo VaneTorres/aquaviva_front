@@ -31,7 +31,7 @@
         </template>
         <template v-slot:body-cell-action="props">
           <q-td :props="props">
-            <q-btn
+            <!-- <q-btn
               color="secondary"
               icon-right="mdi-book-open-page-variant-outline"
               no-caps
@@ -40,7 +40,7 @@
               @click="seeval(props.row.id, props.row.id_address)"
             >
               <q-tooltip>Ver tareas </q-tooltip>
-            </q-btn>
+            </q-btn> -->
             <q-btn
               color="secondary"
               icon-right="mdi-lan"
@@ -63,22 +63,22 @@
 
 <script>
 import newDepartments from "src/components/newDepartments.vue";
-
+import { mapActions } from "vuex";
 const columns = [
   {
-    name: "name",
+    name: "area",
     required: true,
     label: "DEPARTAMENTO",
     align: "center",
-    field: (row) => row.name,
+    field: (row) => row.area,
     format: (val) => `${val}`,
     sortable: true,
   },
   {
-    name: "address",
+    name: "name_address",
     align: "center",
     label: "SEDE",
-    field: "address",
+    field: "name_address",
     sortable: true,
   },
   { name: "action", label: "ACCIÓN", field: "action", align: "center" },
@@ -101,6 +101,9 @@ export default {
     };
   },
   methods: {
+    ...mapActions({
+      GetAxios: "parameters/GetAxios",
+    }),
     /* Muestra estructura organizacional */
     seeval(id_area, id_address) {
       this.$store.commit("parameters/SET_DEPARTAMENT", id_area);
@@ -116,18 +119,9 @@ export default {
     departaments() {
       this.rows = [];
       /*Treaer los departamentos*/
-      var data = { id_user: this.$q.localStorage.getItem("USER") };
-      this.$axios
-        .post("http://127.0.0.1:8000/api/get_areas", data)
+      this.GetAxios({ context: "get_areas" })
         .then((response) => {
-          response.data.forEach((element) => {
-            this.rows.push({
-              id: element.id_area,
-              name: element.area,
-              address: element.name_address,
-              id_address: element.id_address,
-            });
-          });
+          this.rows = response.data;
         })
         .catch((e) => {
           console.log(e);

@@ -29,7 +29,7 @@
             </template>
           </q-input>
         </template>
-        <template v-slot:body-cell-action="props">
+        <!--  <template v-slot:body-cell-action="props">
           <q-td :props="props">
             <q-btn
               color="secondary"
@@ -42,10 +42,10 @@
               <q-tooltip> Ver detalles </q-tooltip>
             </q-btn>
           </q-td>
-        </template>
+        </template> -->
       </q-table>
       <q-dialog v-model="fixed">
-        <NewObligation @new="registerObligation" />
+        <NewObligation @new="listObligation" />
       </q-dialog>
       <q-dialog v-model="view">
         <ViewObligation :data="data" />
@@ -62,47 +62,44 @@ import { mapActions } from "vuex";
 /* Columnas de las tablas */
 const columns = [
   {
-    name: "obligation",
+    name: "enviorenmental_monitoring",
     required: true,
-    label: "OBLIGACIÓN",
+    label: "PROYECTO DE MONITOREO",
     align: "center",
-    field: (row) => row.name,
+    field: (row) => row.enviorenmental_monitoring,
     format: (val) => `${val}`,
     sortable: true,
   },
   {
-    name: "code",
+    name: "tool",
     align: "center",
-    label: "CODIGO",
-    field: "code",
+    label: "OBLIGACIÓN",
+    field: "tool",
     sortable: true,
   },
   {
-    name: "worksheet",
+    name: "program",
+    align: "center",
+    label: "PROGRAMA",
+    field: "program",
+    sortable: true,
+  },
+  {
+    name: "project",
+    align: "center",
+    label: "PROYECTO",
+    field: "project",
+    sortable: true,
+  },
+  {
+    name: "name",
     align: "center",
     label: "NOMBRE DE LA FICHA",
-    field: "worksheet",
+    field: "name",
     sortable: true,
   },
-
-  {
-    name: "responsable",
-    align: "center",
-    label: "RESPONSABLE",
-    field: "responsable",
-    sortable: true,
-  },
-  {
-    name: "address",
-    align: "center",
-    label: "SEDE",
-    field: "address",
-    sortable: true,
-  },
-  { name: "action", label: "ACCION", field: "action", align: "center" },
+  /*  { name: "action", label: "ACCION", field: "action", align: "center" }, */
 ];
-
-const originalRows = [];
 
 export default {
   components: {
@@ -115,58 +112,31 @@ export default {
       fixed: false,
       data: null,
       columns,
-      rows: originalRows,
+      rows: [],
       loading: false,
       filter: "",
       rowCount: 10,
     };
   },
   methods: {
-    /* ...mapActions({
-      axiosAction: "parameters/autenticatedAxios",
-      logout: "parameters/logout",
-    }), */
+    ...mapActions({
+      GetAxios: "parameters/GetAxios",
+    }),
     seeval(id) {
-      this.data = {
-        id_company: id,
-        obligation: "Plan de manejamiento ambiental",
-        code: "PAM-001",
-        worksheet: "Manejo de aguas residuales",
-        responsable: "John Doe",
-        address: "Coca-Cola-FEMSA",
-      };
+      this.data = id;
       this.view = true;
     },
-    registerObligation(info) {
+    listObligation() {
       this.fixed = false;
-      this.rows.push({
-        name: info.obligation_label,
-        code: info.code,
-        worksheet: info.name,
-        responsable: info.responsable_label,
-        address: info.address_label,
+      this.loading = true;
+      this.GetAxios({ context: "get_worksheets" }).then((response) => {
+        this.rows = response.data;
+        this.loading = false;
       });
-      originalRows = this.rows;
     },
   },
   mounted() {
-    var data = {
-      id_user: this.$q.localStorage.getItem("USER"),
-    };
-    this.$axios.post("http://127.0.0.1:8000/api/get_worksheets", data)
-      .then((response) => {
-        response.data.address.forEach((element) => {
-          stringAddressOptions.push({
-            label: element.name.toString(),
-            value: element.name,
-            id: element.id_address.toString(),
-          });
-        });
-        this.optionsAddress = stringAddressOptions;
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    this.listObligation();
   },
 };
 </script>

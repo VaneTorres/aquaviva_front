@@ -63,6 +63,9 @@
           <q-toolbar>
             <q-toolbar-title class="text-center">
               <div class="text-subtitle1">BIENVENIDO(A)</div>
+              <div class="text-subtitle2">
+                {{ $q.localStorage.getItem("NAME_USER") }}
+              </div>
             </q-toolbar-title>
           </q-toolbar>
           <hr />
@@ -85,7 +88,7 @@
 
 <script>
 import EssentialLink from "components/EssentialLink.vue";
-import { mapActions } from 'vuex';
+import { mapActions } from "vuex";
 export default {
   name: "MainLayout",
 
@@ -95,13 +98,12 @@ export default {
   data() {
     return {
       leftDrawerOpen: false,
-
     };
   },
   methods: {
-     ...mapActions({
-            Storelogout: "parameters/logout"
-         }),
+    ...mapActions({
+      Storelogout: "parameters/logout",
+    }),
     logout() {
       this.Storelogout();
     },

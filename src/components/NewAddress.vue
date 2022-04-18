@@ -19,14 +19,14 @@
             :rules="addressNameRules"
             type="text"
             class="col-md-6 col-12"
-            label="Nombre"
+            label="Nombre (*)"
           />
           <q-input
             v-model="description"
             :rules="descriptionRules"
             class="col-md-6 col-12"
             autogrow
-            label="Descripción"
+            label="Descripción (*)"
           />
           <q-select
             use-input
@@ -35,7 +35,7 @@
             @filter="filterTown"
             v-model="town"
             :options="options_town"
-            label="Municipio"
+            label="Municipio (*)"
             class="col-md-6 col-12"
             color="primary"
           />
@@ -44,25 +44,25 @@
             :rules="addressRules"
             type="text"
             class="col-md-6 col-12"
-            label="Dirección"
+            label="Dirección (*)"
           />
           <q-input
             v-model="phone"
             :rules="phoneRules"
             class="col-md-6 col-12"
             type="text"
-            label="Teléfono"
+            label="Teléfono (*)"
           />
           <q-input
             v-model="contact"
             :rules="contactRules"
             class="col-md-6 col-12"
             type="text"
-            label="Responsable"
+            label="Responsable (*)"
           />
         </div>
         <q-btn
-          class="q-my-sm"
+          class="q-my-sm float-right"
           color="primary"
           type="submit"
           label="Enviar"
@@ -94,12 +94,21 @@ export default {
       options_town: stringTownOptions,
       //VALIDATE
       townRule: [(v) => !!v || "El municipio es requerido."],
-      addressNameRules: [(v) => !!v || "El nombre de la sede es requerida."],
+      addressNameRules: [(v) => !!v || "El nombre de la sede es requerido."],
       descriptionRules: [
         (v) => !!v || "La descripción de la sede es requerida.",
       ],
       addressRules: [(v) => !!v || "La dirección de la sede es requerida."],
-      phoneRules: [(v) => !!v || "El teléfono de la sede es requerido."],
+      phoneRules: [
+        (v) => !!v || "El teléfono de la sede es requerido.",
+        (v) =>
+          v.length <= 10 ||
+          "El teléfono debe de ser valido (Menor o igual a 10 caracteres)",
+        (v) =>
+          v.length >= 7 ||
+          "El teléfono debe de ser valido (Mayor o igual a 7 caracteres)",
+        (v) => /^[0-9]+$/i.test(v) || "El teléfono no debe tener letras",
+      ],
       contactRules: [(v) => !!v || "El responsable de la sede es requerido."],
     };
   },
@@ -118,11 +127,10 @@ export default {
       }
       update(() => {
         const needle = val.toLowerCase();
-        this.options_town= stringTownOptions[0].filter(
+        this.options_town = stringTownOptions[0].filter(
           (v) => v.value.toLowerCase().indexOf(needle) > -1
         );
       });
-      console.log(this.options_town);
     },
     //REGISTRO DE SELECT
     registerAddress() {
@@ -138,17 +146,17 @@ export default {
         type_address: "Secundaria",
       };
       this.StorePost({
-        context: "http://127.0.0.1:8000/api/store_address",
+        context: "store_address",
         data: data,
-      }).then((response) => {
-        this.$emit("new", data);
+      }).then(() => {
+        this.$emit("new");
       });
     },
   },
   mounted() {
-     this.GetTown().then((response) => {
-        stringTownOptions.push(response);
-      });
+    this.GetTown().then((response) => {
+      stringTownOptions.push(response);
+    });
   },
 };
 </script>

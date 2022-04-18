@@ -1,67 +1,71 @@
 <template>
-  <q-page>
-    <div class="contenedor absolute-center">
-      <q-form
-        id="formForget"
-        v-model="valid"
-        lazy-validation
-        class="text-center"
-        @submit.prevent="forget"
-      >
-        <p>Recuperar la contraseña</p>
-        <div class="q-col-gutter-md">
-          <q-input
-            type="email"
-            v-model="email"
-            :rules="emailRules"
-            placeholder="Correo electrónico"
-          />
-
-          <q-input
-            v-model="new_password"
-            :rules="NewpasswordRules"
-            placeholder="Nueva contraseña"
-            :type="isPwd ? 'password' : 'text'"
+  <q-layout>
+    <q-page-container>
+      <q-page class="flex flex-center">
+        <div class="contenedor absolute">
+          <q-form
+            id="formForget"
+            v-model="valid"
+            lazy-validation
+            class="text-center"
+            @submit.prevent="forget"
           >
-            <template v-slot:append>
-              <q-icon
-                :name="isPwd ? 'visibility_off' : 'visibility'"
-                class="cursor-pointer"
-                @click="isPwd = !isPwd"
+            <p>Recuperar la contraseña</p>
+            <div class="q-col-gutter-md">
+              <q-input
+                type="email"
+                v-model="email"
+                :rules="emailRules"
+                placeholder="Correo electrónico"
               />
-            </template>
-          </q-input>
 
-          <q-input
-            v-model="confirm_password"
-            :rules="passwordRules"
-            placeholder="Repetir contraseña"
-            :type="isPwd ? 'password' : 'text'"
-          >
-            <template v-slot:append>
-              <q-icon
-                :name="isPwd ? 'visibility_off' : 'visibility'"
-                class="cursor-pointer"
-                @click="isPwd = !isPwd"
-              />
-            </template>
-          </q-input>
+              <q-input
+                v-model="new_password"
+                :rules="NewpasswordRules"
+                placeholder="Nueva contraseña"
+                :type="isPwd ? 'password' : 'text'"
+              >
+                <template v-slot:append>
+                  <q-icon
+                    :name="isPwd ? 'visibility_off' : 'visibility'"
+                    class="cursor-pointer"
+                    @click="isPwd = !isPwd"
+                  />
+                </template>
+              </q-input>
 
-          <q-btn type="submit" label="Enviar" form="formForget" />
-          <q-item clickable tag="a" to="/">
-            <q-item-label>Iniciar sesión</q-item-label>
-          </q-item>
+              <q-input
+                v-model="confirm_password"
+                :rules="passwordRules"
+                placeholder="Repetir contraseña"
+                :type="isPwd ? 'password' : 'text'"
+              >
+                <template v-slot:append>
+                  <q-icon
+                    :name="isPwd ? 'visibility_off' : 'visibility'"
+                    class="cursor-pointer"
+                    @click="isPwd = !isPwd"
+                  />
+                </template>
+              </q-input>
+
+              <q-btn type="submit" label="Enviar" form="formForget" />
+              <q-item clickable tag="a" to="/">
+                <q-item-label>Iniciar sesión</q-item-label>
+              </q-item>
+            </div>
+          </q-form>
+          <div class="drops">
+            <div class="drop drop-1"></div>
+            <div class="drop drop-2"></div>
+            <div class="drop drop-3"></div>
+            <div class="drop drop-4"></div>
+            <div class="drop drop-5"></div>
+          </div>
         </div>
-      </q-form>
-      <div class="drops">
-        <div class="drop drop-1"></div>
-        <div class="drop drop-2"></div>
-        <div class="drop drop-3"></div>
-        <div class="drop drop-4"></div>
-        <div class="drop drop-5"></div>
-      </div>
-    </div>
-  </q-page>
+      </q-page>
+    </q-page-container>
+  </q-layout>
 </template>
 
 <script>
@@ -104,7 +108,15 @@ export default defineComponent({
     };
   },
   methods: {
-    forget: function (e) {
+    forget() {
+      this.$q.loading.show({
+        spinner: QSpinnerFacebook,
+        spinnerColor: "black",
+        spinnerSize: 140,
+        backgroundColor: "green",
+        message: "Estamos validando sus credenciales",
+        messageColor: "black",
+      });
       var token = this.$route.params.token;
       const data = {
         password: this.new_password,
@@ -113,8 +125,13 @@ export default defineComponent({
         email: this.email,
       };
       this.$axios
-        .post("http://127.0.0.1:8000/api/password/reset", data)
+        .post(
+          this.$store.getters["parameters/URL_PRODUCTION"] + "password/reset",
+          data
+        )
         .then((response) => {
+          window.location = "/";
+          this.$q.loading.hide();
           if (response.data.code == 201) {
             this.$q.notify({
               message: response.data.message,

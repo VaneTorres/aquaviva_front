@@ -178,12 +178,14 @@
         <q-btn
           v-show="step != 3 ? true : false"
           @click="next()"
+          class="float-right q-my-md"
           color="primary"
           label="Continuar"
         />
         <q-btn
           v-show="step === 3 ? true : false"
           @click="submit()"
+          class="float-right q-my-md"
           color="primary"
           label="Registrar"
         />
@@ -193,7 +195,7 @@
           color="primary"
           @click="$refs.stepper.previous()"
           label="Anterior"
-          class="q-ml-sm"
+          class="q-ml-sm float-right q-my-md"
         />
       </q-stepper-navigation>
     </template>
@@ -263,7 +265,8 @@ export default {
         (v) =>
           v.length >= 7 ||
           "El número de celular debe de ser mínimo de 7 caracteres.",
-        (v) => /^[0-9]+$/i.test(v) || "El número de celular no debe tener letras",
+        (v) =>
+          /^[0-9]+$/i.test(v) || "El número de celular no debe tener letras",
       ],
       emailRules: [
         (v) => !!v || "El correo electrónico es requerido.",
@@ -294,7 +297,7 @@ export default {
     async submit() {
       /* Validar formulario */
       const isValid = await this.$refs.form.validate();
-      
+
       if (isValid) {
         /* Metodo que envia formulario */
         var address = {
@@ -324,7 +327,7 @@ export default {
         };
         /* Guardar empresa */
         this.StorePost({
-          context: "http://127.0.0.1:8000/api/company_creation",
+          context: "company_creation",
           data: data,
           headers: headers,
         })
@@ -332,8 +335,12 @@ export default {
             this.$emit("new");
           })
           .catch((e) => {
-            if (e.data.code == 402){
-              this.emailRules.push((v) =>e.data.code != 402|| "Este correo " + this.email + " ya existe.");
+            if (e.data.code == 402) {
+              this.emailRules.push(
+                (v) =>
+                  e.data.code != 402 ||
+                  "Este correo " + this.email + " ya existe."
+              );
               this.submit();
               this.emailRules.pop();
             }
@@ -371,7 +378,7 @@ export default {
         const needle = val.toLowerCase();
         if (!isNaN(needle)) {
           this.options_ciiu = stringCiiuOptions[0].filter(
-            (v) => v.value.toLowerCase().indexOf(needle) > -1
+            (v) => v.label.toLowerCase().indexOf(needle) > -1
           );
         } else {
           this.options_ciiu = stringCiiuOptions[0].filter(

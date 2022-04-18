@@ -18,7 +18,6 @@
             use-input
             :rules="mediumsRule"
             input-debounce="0"
-            @filter="filtermediums"
             v-model="mediums"
             :options="optionmediums"
             label="Medio *"
@@ -54,7 +53,6 @@
 </template>
 <script>
 import { mapActions } from "vuex";
-const stringmediumsOptions = [];
 export default {
   data() {
     return {
@@ -63,7 +61,7 @@ export default {
       name: null,
       code: null,
       mediums: null,
-      optionmediums: stringmediumsOptions,
+      optionmediums: ["Abiótico", "Biótico", "Socioeconómico"],
       //VALIDATE
       nameRules: [(v) => !!v || "El nombre del programa es requerido."],
       codeRules: [(v) => !!v || "El código del programa es requerido."],
@@ -88,26 +86,6 @@ export default {
         this.$emit("new");
       });
     },
-    //FILTRO DEL SELECT
-    filtermediums(val, update) {
-      if (val === "") {
-        update(() => {
-          this.optionmediums = stringmediumsOptions[0];
-        });
-        return;
-      }
-      update(() => {
-        const needle = val.toLowerCase();
-        this.optionmediums = stringmediumsOptions[0].filter(
-          (v) => v.value.toLowerCase().indexOf(needle) > -1
-        );
-      });
-    },
-  },
-  mounted() {
-    this.GetMedium().then((response) => {
-      stringmediumsOptions.push(response);
-    });
   },
 };
 </script>

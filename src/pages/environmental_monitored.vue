@@ -51,13 +51,6 @@ const columns = [
     sortable: true,
   },
   {
-    name: "tool",
-    align: "center",
-    label: "INSTRUMENTO AMBIENTAL",
-    field: "tool",
-    sortable: true,
-  },
-  {
     name: "authority",
     align: "center",
     label: "AUTORIDAD AMBIENTAL",

@@ -69,10 +69,9 @@
               :key="index"
               v-model="tool"
               :label="item.label"
-              :value="item.id"
+              :val="item.id"
             />
           </div>
-          {{ tool }}
         </div>
         <q-btn
           class="q-my-md float-right"
@@ -133,7 +132,7 @@ export default {
         id_town: this.town.id,
         especification: this.ubication,
         id_authority: this.authority.id,
-        id_tool: this.tool.id,
+        tools: this.tool,
         id_address: this.address.id,
       };
       this.StorePost({

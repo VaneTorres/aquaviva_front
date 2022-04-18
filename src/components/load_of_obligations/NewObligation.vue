@@ -19,6 +19,7 @@
           use-input
           class="col-md-6 col-12"
           :rules="projectMonitoringRule"
+          @update:model-value="(v) => listObligation(v.id)"
           input-debounce="0"
           :options="optionsprojectMonitoring"
           @filter="filterProjectMonitoring"
@@ -58,7 +59,6 @@
           use-input
           :rules="mediumsRule"
           input-debounce="0"
-          @filter="filtermediums"
           v-model="mediums"
           :options="optionmediums"
           label="Medio (*)"
@@ -74,7 +74,7 @@
           :options="options_program"
           @filter="filterProgram"
           @update:model-value="(v) => listProject(v.id)"
-          label="Programa (*)"
+          label="Programa ambiental (*)"
           color="primary"
           data-vv-scope="formnew"
         >
@@ -94,6 +94,21 @@
             </q-item>
           </template>
         </q-select>
+        <q-btn
+          flat
+          class="q-my-md"
+          color="primary"
+          icon="mdi-information-variant"
+        >
+          <q-tooltip class="text-body2">
+            <q-tooltip-label>
+              <q-icon name="mdi-information-variant" />
+              Agregar solamente los proyectos cuando apliquen y estén asociados
+              a un programa. Entiéndase como proyecto cuando el mismo tiene una
+              fecha de inicio y finalización establecida.
+            </q-tooltip-label>
+          </q-tooltip>
+        </q-btn>
         <q-select
           v-model="project"
           use-input
@@ -101,7 +116,7 @@
           input-debounce="0"
           :options="optionsproject"
           @filter="filterProject"
-          label="Proyecto"
+          label="Proyecto ambiental"
           color="primary"
           data-vv-scope="formnew"
         >
@@ -128,7 +143,6 @@
           :rules="obligationRule"
           input-debounce="0"
           :options="optionsobligation"
-          @filter="filterTool"
           label="Obligación (*)"
           color="primary"
           data-vv-scope="formnew"
@@ -140,21 +154,13 @@
               </q-item-section>
             </q-item>
           </template>
-          <template v-slot:option="scope">
-            <q-item v-bind="scope.itemProps">
-              <q-item-section>
-                <q-item-label v-html="scope.opt.label" />
-                <q-item-label caption>{{ scope.opt.description }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </template>
         </q-select>
         <q-input
           autogrow
           v-model="name"
           type="textarea"
           class="col-md-6 col-12"
-          label="Nombre"
+          label="Nombre o titulo de la ficha ICA"
         />
         <q-input
           v-model="objetive"
@@ -358,12 +364,10 @@
 </template>
 <script>
 import { mapActions } from "vuex";
-var stringToolOptions = [];
 var stringResponsableOptions = [];
 var stringAddressOptions = [];
 const stringProgramOptions = [];
 const stringProjectMonitoringOptions = [];
-const stringmediumsOptions = [];
 const stringProjectOptions = [];
 /* Columnas tabla de indicadores */
 const columnsIndicator = [
@@ -475,11 +479,11 @@ export default {
       optionsphase: ["Constructiva", "Operativa"],
       options_program: stringProgramOptions,
       optionsprojectMonitoring: stringProjectMonitoringOptions,
-      optionsobligation: stringToolOptions,
+      optionsobligation: [],
       optionsproject: stringProjectOptions,
       optionsAddress: stringAddressOptions,
       optionsresponsable: stringResponsableOptions,
-      optionmediums: stringmediumsOptions,
+      optionmediums: ["Abiótico", "Biótico", "Socioeconómico"],
       /* model indicador */
       optionsfrequency: [
         "Horario",
@@ -553,35 +557,22 @@ export default {
         });
       });
     },
+    listObligation(id) {
+      this.optionsobligation = [];
+      this.StorePost({
+        context: "get_monitoring_tools_by_project",
+        data: { id: id },
+      }).then((response) => {
+        response.data.forEach((element) => {
+          this.optionsobligation.push({
+            label: element.tool.toString(),
+            id: element.id.toString(),
+          });
+        });
+      });
+    },
+
     //Filtros de select
-    filtermediums(val, update) {
-      if (val === "") {
-        update(() => {
-          this.optionmediums = stringmediumsOptions[0];
-        });
-        return;
-      }
-      update(() => {
-        const needle = val.toLowerCase();
-        this.optionmediums = stringmediumsOptions[0].filter(
-          (v) => v.value.toLowerCase().indexOf(needle) > -1
-        );
-      });
-    },
-    filterTool(val, update) {
-      if (val === "") {
-        update(() => {
-          this.optionsobligation = stringToolOptions[0];
-        });
-        return;
-      }
-      update(() => {
-        const needle = val.toLowerCase();
-        this.optionsobligation = stringToolOptions[0].filter(
-          (v) => v.label.toLowerCase().indexOf(needle) > -1
-        );
-      });
-    },
     filterProjectMonitoring(val, update) {
       if (val === "") {
         update(() => {
@@ -775,9 +766,6 @@ export default {
       stringProgramOptions.push(response);
     });
     /* Fin llenar select programas */
-    this.GetMedium().then((response) => {
-      stringmediumsOptions.push(response);
-    });
     /*Trae las sedes del usuario logueado*/
     this.GetAddress().then((response) => {
       stringAddressOptions.push(response);

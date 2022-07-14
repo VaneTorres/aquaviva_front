@@ -10,7 +10,7 @@
             class="text-center"
             @submit.prevent="login"
           >
-            <p>Bienvenido Aquaviva</p>
+            <p>Bienvenido HGOA Aquaviva</p>
             <div class="q-col-gutter-md">
               <q-input
                 type="email"

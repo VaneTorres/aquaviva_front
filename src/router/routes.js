@@ -7,6 +7,7 @@ const routes = [
         path: "",
         component: () => import("pages/auth/Login.vue"),
         name: "login",
+        meta: { loginAuth: true },
       },
       {
         path: "",

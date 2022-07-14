@@ -19,7 +19,7 @@
             :rules="nameRules"
             type="text"
             class="col-md-6 col-12"
-            label="Nombre del depatamento"
+            label="Nombre del depatamento (*)"
           />
           <q-select
             use-input
@@ -28,7 +28,7 @@
             @filter="filterAddress"
             v-model="address"
             :options="optionsaddress"
-            label="Sede"
+            label="Sede  (*)"
             class="col-md-6 col-12"
             color="primary"
           />
@@ -38,13 +38,14 @@
           color="primary"
           label="Enviar"
           form="formDepartament"
-          class="q-mt-lg"
+          class="q-mt-lg float-right q-my-md"
         />
       </q-form>
     </q-card-section>
   </q-card>
 </template>
 <script>
+import { mapActions } from "vuex";
 const stringAddressOptions = [];
 export default {
   props: {
@@ -60,63 +61,49 @@ export default {
       address: null,
       optionsaddress: stringAddressOptions,
       //VALIDATE
-      nameRules: [(v) => !!v || "El nombre del deparamento es requerida."],
+      nameRules: [(v) => !!v || "El nombre del departamento es requerida."],
       addressRule: [(v) => !!v || "La sede es requerida."],
     };
   },
   methods: {
+    ...mapActions({
+      GetAddress: "parameters/GetAddress",
+      StorePost: "parameters/PostAxios",
+    }),
     registerDepartaments() {
       var data = {
         area: this.name,
         id_address: this.address.id,
         name_address: this.address.label,
       };
-      this.$axios
-        .post("http://127.0.0.1:8000/api/store_area", data)
-        .then((response) => {
-          this.$emit("new", data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      this.StorePost({
+        context: "store_area",
+        data: data,
+      }).then(() => {
+        this.$emit("new");
+      });
     },
     //FILTRO DEL SELECT
     filterAddress(val, update) {
       if (val === "") {
         update(() => {
-          this.optionsaddress = stringAddressOptions;
+          this.optionsaddress = stringAddressOptions[0];
         });
         return;
       }
       update(() => {
         const needle = val.toLowerCase();
-        this.optionsaddress = stringAddressOptions.filter(
-          (v) => v.value.toLowerCase().indexOf(needle) > -1
+        this.optionsaddress = stringAddressOptions[0].filter(
+          (v) => v.label.toLowerCase().indexOf(needle) > -1
         );
       });
     },
   },
   created() {
-    //CONSULTAR LOS MUNICIPIOS
-    var data = {
-      id_user: this.$q.localStorage.getItem("USER"),
-    };
-    this.$axios
-      .post("http://127.0.0.1:8000/api/get_address_by_users", data)
-      .then((response) => {
-        this.optionsaddress.length = 0;
-        response.data.address.forEach((element) => {
-          stringAddressOptions.push({
-            label: element.name.toString(),
-            value: element.name,
-            id: element.id_address.toString(),
-          });
-        });
-        this.optionsaddress = stringAddressOptions;
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    //Select address
+    this.GetAddress().then((response) => {
+      stringAddressOptions.push(response);
+    });
   },
 };
 </script>

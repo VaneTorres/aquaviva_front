@@ -91,12 +91,12 @@
           </q-card-section>
           <q-card-section class="text-center">
             <div class="text-h6">Departamento</div>
-            <div class="text-subtitle2">CEO</div>
+            <div class="text-subtitle2">Recursos Humanos</div>
           </q-card-section>
-          <q-card-section class="text-center">
+          <!--  <q-card-section class="text-center">
             <div class="text-h6">Cargo</div>
             <div class="text-subtitle2">Ingeniero ambiental</div>
-          </q-card-section>
+          </q-card-section> -->
         </q-card>
       </div>
     </div>

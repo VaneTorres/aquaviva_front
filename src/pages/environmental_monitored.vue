@@ -15,7 +15,10 @@
             color="primary"
             icon="add"
             @click="newMonitoring = true"
-          />
+            v-if="permissions.includes('Crear monitoreo')"
+          >
+            <q-tooltip>Nuevo proyecto de la organización</q-tooltip>
+          </q-btn>
           <q-space />
           <q-input
             outlined
@@ -83,6 +86,7 @@ export default {
   },
   data() {
     return {
+      permissions: [],
       newMonitoring: false,
       columns,
       rows: originalRows,
@@ -111,6 +115,7 @@ export default {
   },
 
   created() {
+    this.permissions = this.$q.localStorage.getItem("PERMISSIONS");
     this.UpdateList();
   },
 };

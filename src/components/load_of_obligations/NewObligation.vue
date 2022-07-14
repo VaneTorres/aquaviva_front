@@ -3,6 +3,7 @@
     v-model="step"
     ref="stepper"
     alternative-labels
+    style="max-width: 800px"
     color="primary"
     animated
   >
@@ -44,6 +45,25 @@
           </template>
         </q-select>
         <q-select
+          v-model="obligation"
+          use-input
+          class="col-md-6 col-12"
+          :rules="obligationRule"
+          input-debounce="0"
+          :options="optionsobligation"
+          label="Obligación (*)"
+          color="primary"
+          data-vv-scope="formnew"
+        >
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey"
+                >No hay resultados
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
+        <q-select
           v-model="phase"
           use-input
           class="col-md-6 col-12"
@@ -60,6 +80,7 @@
           :rules="mediumsRule"
           input-debounce="0"
           v-model="mediums"
+          @update:model-value="(v) => listProgram(v)"
           :options="optionmediums"
           label="Medio (*)"
           class="col-md-6 col-12"
@@ -67,7 +88,7 @@
         />
         <q-select
           v-model="program"
-          use-input
+          :use-input="program != null ? false : true"
           class="col-md-6 col-12"
           :rules="programRule"
           input-debounce="0"
@@ -96,23 +117,21 @@
         </q-select>
         <q-btn
           flat
-          class="q-my-md"
           color="primary"
           icon="mdi-information-variant"
+          class="q-mr-sm"
         >
           <q-tooltip class="text-body2">
-            <q-tooltip-label>
-              <q-icon name="mdi-information-variant" />
-              Agregar solamente los proyectos cuando apliquen y estén asociados
-              a un programa. Entiéndase como proyecto cuando el mismo tiene una
-              fecha de inicio y finalización establecida.
-            </q-tooltip-label>
+            Agregar solamente los proyectos cuando apliquen y estén asociados a
+            un programa. <br />
+            Entiéndase como proyecto cuando el mismo tiene una fecha de inicio y
+            finalización establecida.
           </q-tooltip>
         </q-btn>
         <q-select
           v-model="project"
+          class="col-md-5 col-12"
           use-input
-          class="col-md-6 col-6"
           input-debounce="0"
           :options="optionsproject"
           @filter="filterProject"
@@ -136,25 +155,7 @@
             </q-item>
           </template>
         </q-select>
-        <q-select
-          v-model="obligation"
-          use-input
-          class="col-md-6 col-12"
-          :rules="obligationRule"
-          input-debounce="0"
-          :options="optionsobligation"
-          label="Obligación (*)"
-          color="primary"
-          data-vv-scope="formnew"
-        >
-          <template v-slot:no-option>
-            <q-item>
-              <q-item-section class="text-grey"
-                >No hay resultados
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-select>
+
         <q-input
           autogrow
           v-model="name"
@@ -288,12 +289,10 @@
           color="primary"
         />
         <q-input
+          type="number"
           v-model="budget"
           class="col-md-6 col-12"
           label="Presupuesto"
-          mask="###.##"
-          fill-mask=" "
-          reverse-fill-mask
         ></q-input>
 
         <q-select
@@ -366,9 +365,9 @@
 import { mapActions } from "vuex";
 var stringResponsableOptions = [];
 var stringAddressOptions = [];
-const stringProgramOptions = [];
-const stringProjectMonitoringOptions = [];
-const stringProjectOptions = [];
+var stringProgramOptions = [];
+var stringProjectMonitoringOptions = [];
+var stringProjectOptions = [];
 /* Columnas tabla de indicadores */
 const columnsIndicator = [
   {
@@ -454,9 +453,6 @@ const columnsActivity = [
     sortable: true,
   },
 ];
-/* Fecha actual */
-var f = new Date();
-var today = f.getFullYear() + "-" + (f.getMonth() + 1) + "-0" + f.getDate();
 export default {
   data() {
     return {
@@ -476,8 +472,12 @@ export default {
       mediums: null,
       projectMonitoring: null,
       phase: null,
-      optionsphase: ["Constructiva", "Operativa"],
-      options_program: stringProgramOptions,
+      optionsphase: [
+        "Constructiva",
+        "Operativa",
+        "Desmantelamiento y abandono",
+      ],
+      options_program: [],
       optionsprojectMonitoring: stringProjectMonitoringOptions,
       optionsobligation: [],
       optionsproject: stringProjectOptions,
@@ -521,16 +521,6 @@ export default {
       programRule: [(v) => !!v || "El programa es requerido."],
       obligationRule: [(v) => !!v || "La obligación es requerida."],
       mediumsRule: [(v) => !!v || "El medio es requerida."],
-      /* dateInitialRules: [
-        (v) =>
-          v >= today ||
-          "La fecha final tiene que ser mayor a la fecha actual " + today + ".",
-      ], */
-      /*  dateFinalRules: [
-        (v) =>
-          v > this.startdate ||
-          "La fecha final tiene que ser mayor de la fecha inicial.",
-      ], */
     };
   },
   methods: {
@@ -543,14 +533,31 @@ export default {
       StorePost: "parameters/PostAxios",
     }),
     /* Consulta los proyectos por el programa seleccionado */
+    listProgram(medium) {
+      stringProgramOptions = [];
+      stringProjectOptions = [];
+      this.project = null;
+      this.program = null;
+      this.StorePost({
+        context: "get_program_by_medium",
+        data: { medium: medium },
+      }).then((response) => {
+        response.data.programs.forEach((element) => {
+          stringProgramOptions.push({
+            label: element.name.toString(),
+            id: element.id.toString(),
+          });
+        });
+      });
+    },
     listProject(id) {
-      this.optionsproject = [];
+      stringProjectOptions = [];
       this.StorePost({
         context: "get_projects_by_programs",
         data: { id_program: id },
       }).then((response) => {
         response.data.projects.forEach((element) => {
-          this.optionsproject.push({
+          stringProjectOptions.push({
             label: element.name.toString(),
             id: element.id.toString(),
           });
@@ -575,9 +582,11 @@ export default {
     //Filtros de select
     filterProjectMonitoring(val, update) {
       if (val === "") {
-        update(() => {
-          this.optionsprojectMonitoring = stringProjectMonitoringOptions;
-        });
+        setTimeout(() => {
+          update(() => {
+            this.optionsprojectMonitoring = stringProjectMonitoringOptions;
+          });
+        }, 1000);
         return;
       }
       update(() => {
@@ -589,23 +598,28 @@ export default {
     },
     filterProgram(val, update) {
       if (val === "") {
-        update(() => {
-          this.options_program = stringProgramOptions[0];
-        });
+        setTimeout(() => {
+          update(() => {
+            this.options_program = stringProgramOptions;
+          });
+        }, 2000);
+
         return;
       }
       update(() => {
         const needle = val.toLowerCase();
-        this.options_program = stringProgramOptions[0].filter(
+        this.options_program = this.stringProgramOptions.filter(
           (v) => v.label.toLowerCase().indexOf(needle) > -1
         );
       });
     },
     filterProject(val, update) {
       if (val === "") {
-        update(() => {
-          this.optionsproject = stringProjectOptions;
-        });
+        setTimeout(() => {
+          update(() => {
+            this.optionsproject = stringProjectOptions;
+          });
+        }, 2000);
         return;
       }
       update(() => {
@@ -631,9 +645,11 @@ export default {
     },
     filterResponsable(val, update) {
       if (val === "") {
-        update(() => {
-          this.optionsresponsable = stringResponsableOptions;
-        });
+        setTimeout(() => {
+          update(() => {
+            this.optionsresponsable = stringResponsableOptions;
+          });
+        }, 2000);
         return;
       }
       update(() => {
@@ -645,20 +661,20 @@ export default {
     },
     /* Consulta los usuarios una vez seleccione la sede */
     UserbyAddress() {
+      stringResponsableOptions = [];
+      this.responsable = null;
       var data = { id_address: this.address.id };
-      this.StorePost({ context: "get_users_by_address", data: data })
-        .then((response) => {
+      this.StorePost({ context: "get_users_by_address_area", data: data }).then(
+        (response) => {
           response.data.forEach((element) => {
-            this.optionsresponsable.push({
+            stringResponsableOptions.push({
               label: element.name.toString(),
               value: element.name,
               id: element.id.toString(),
             });
           });
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+        }
+      );
     },
     /* Agrega el indicador */
     addIndicator() {
@@ -704,6 +720,7 @@ export default {
       this.budget = null;
       this.responsable = null;
       this.money = null;
+      this.address = null;
       this.loading = false;
     },
 
@@ -725,7 +742,7 @@ export default {
       this.StorePost({
         context: "create_worksheets",
         data: data,
-      }).then((response) => {
+      }).then(() => {
         this.$emit("new");
       });
     },
@@ -733,12 +750,12 @@ export default {
   mounted() {
     /* Vaciar los select del componente*/
     this.optionsmoney = [];
-
+    stringProjectMonitoringOptions = [];
     this.GetAxios({
       context: "get_projects",
     }).then((response) => {
       response.data.forEach((element) => {
-        this.optionsprojectMonitoring.push({
+        stringProjectMonitoringOptions.push({
           label: element.project.toString(),
           id: element.id.toString(),
         });
@@ -756,16 +773,6 @@ export default {
         });
       });
     });
-
-    /*Trae las obligaciones*/
-    this.GetTool().then((response) => {
-      stringToolOptions.push(response);
-    });
-    /* llenar select programas */
-    this.GetProgram().then((response) => {
-      stringProgramOptions.push(response);
-    });
-    /* Fin llenar select programas */
     /*Trae las sedes del usuario logueado*/
     this.GetAddress().then((response) => {
       stringAddressOptions.push(response);

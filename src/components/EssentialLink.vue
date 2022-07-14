@@ -20,6 +20,33 @@
       <q-item-label>Empresas</q-item-label>
     </q-item-section>
   </q-item>
+  <q-item
+    clickable
+    tag="a"
+    to="/admin/mycompany"
+    v-if="permissions.includes('Ver mi empresa')"
+  >
+    <q-item-section avatar>
+      <q-icon name="business" />
+    </q-item-section>
+    <q-item-section>
+      <q-item-label>Mi empresa</q-item-label>
+    </q-item-section>
+  </q-item>
+  <q-item
+    clickable
+    tag="a"
+    to="/admin/departments"
+    v-if="permissions.includes('Listar áreas')"
+  >
+    <q-item-section avatar>
+      <q-icon name="mdi-file-tree-outline" />
+    </q-item-section>
+    <q-item-section>
+      <q-item-label>Departamentos</q-item-label>
+    </q-item-section>
+  </q-item>
+
   <q-expansion-item
     class="q-py-sm"
     icon="mdi-cogs"
@@ -58,35 +85,6 @@
       </q-item>
     </q-list>
   </q-expansion-item>
-  <q-item
-    clickable
-    tag="a"
-    to="/admin/mycompany"
-    v-if="permissions.includes('Ver mi empresa')"
-  >
-    <q-item-section avatar>
-      <q-icon name="business" />
-    </q-item-section>
-    <q-item-section>
-      <q-item-label>Mi empresa</q-item-label>
-    </q-item-section>
-  </q-item>
-  <q-item clickable tag="a" to="/admin/plansuser">
-    <q-item-section avatar>
-      <q-icon name="mdi-ballot-outline" />
-    </q-item-section>
-    <q-item-section>
-      <q-item-label>Planes</q-item-label>
-    </q-item-section>
-  </q-item>
-  <q-item clickable tag="a" to="/admin/plans">
-    <q-item-section avatar>
-      <q-icon name="mdi-ballot-outline" />
-    </q-item-section>
-    <q-item-section>
-      <q-item-label>Parametrizar planes</q-item-label>
-    </q-item-section>
-  </q-item>
   <q-expansion-item
     class="q-py-sm"
     icon="mdi-clipboard-text-search-outline"
@@ -101,7 +99,7 @@
         v-if="permissions.includes('Listar monitoreos')"
       >
         <q-item-section avatar>
-          <q-icon name="mdi-clipboard-text-search-outline" />
+          <q-icon name="mdi-head-cog-outline" />
         </q-item-section>
         <q-item-section>
           <q-item-label>Proyectos de la organización</q-item-label>
@@ -134,12 +132,12 @@
           <q-icon name="mdi-book-arrow-up-outline" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>Carga de obligaciones manual</q-item-label>
+          <q-item-label>Carga de obligaciones</q-item-label>
         </q-item-section>
       </q-item>
       <q-item clickable tag="a" to="/admin/load_of_obligations/evidence">
         <q-item-section avatar>
-          <q-icon name="mdi-book-arrow-up-outline" />
+          <q-icon name="mdi-book-search-outline" />
         </q-item-section>
         <q-item-section>
           <q-item-label>Carga de evidencias</q-item-label>
@@ -147,15 +145,6 @@
       </q-item>
     </q-list>
   </q-expansion-item>
-
-  <q-item clickable tag="a" to="/admin/departments">
-    <q-item-section avatar>
-      <q-icon name="mdi-file-tree-outline" />
-    </q-item-section>
-    <q-item-section>
-      <q-item-label>Departamentos</q-item-label>
-    </q-item-section>
-  </q-item>
 </template>
 
 <script>

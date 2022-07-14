@@ -1,7 +1,7 @@
 <template>
   <q-card style="width: 800px">
     <q-card-section class="row items-center q-pb-none">
-      <div class="text-h6">AGREGAR PROGRAMA AMBIENTAL</div>
+      <div class="text-h6">EDITAR PROGRAMA AMBIENTAL</div>
       <q-space />
       <q-btn icon="close" flat round dense v-close-popup />
     </q-card-section>
@@ -11,21 +11,21 @@
         v-model="valid"
         lazy-validation
         class="text-center"
-        @submit.prevent="registerPrograms"
+        @submit.prevent="EditPrograms"
       >
         <div class="row q-col-gutter-sm">
           <q-select
             use-input
             :rules="mediumsRule"
             input-debounce="0"
-            v-model="medium"
+            v-model="data.medium"
             :options="optionmediums"
             label="Medio (*)"
             class="col-md-6 col-12"
             color="primary"
           />
           <q-input
-            v-model="code"
+            v-model="data.code"
             :rules="codeRules"
             type="text"
             class="col-md-6 col-12"
@@ -33,7 +33,7 @@
           />
           <q-input
             autogrow
-            v-model="name"
+            v-model="data.name"
             :rules="nameRules"
             type="text"
             class="col-md-6 col-12"
@@ -54,13 +54,14 @@
 <script>
 import { mapActions } from "vuex";
 export default {
+  props: {
+    id: Number,
+  },
   data() {
     return {
       valid: true,
       //V-MODEL
-      name: null,
-      code: null,
-      medium: null,
+      data: {},
       optionmediums: ["Abiótico", "Biótico", "Socioeconómico"],
       //VALIDATE
       nameRules: [(v) => !!v || "El nombre del programa es requerido."],
@@ -72,19 +73,21 @@ export default {
     ...mapActions({
       StorePost: "parameters/PostAxios",
     }),
-    registerPrograms() {
-      var data = {
-        name: this.name,
-        code: this.code,
-        medium: this.medium,
-      };
+    EditPrograms() {
       this.StorePost({
-        context: "create_program",
-        data: data,
+        context: "update_program",
+        data: this.data,
       }).then(() => {
         this.$emit("editList");
       });
     },
+  },
+  mounted() {
+    this.StorePost({ context: "show_program", data: { id: this.id } }).then(
+      (response) => {
+        this.data = response.data.program;
+      }
+    );
   },
 };
 </script>

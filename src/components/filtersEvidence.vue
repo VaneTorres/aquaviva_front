@@ -21,7 +21,18 @@
           label="Sede"
           class="col-md-6 col-12"
           color="primary"
-          @input-update="getProjects((v) => v.id)"
+          @update:model-value="(v) => getAreByAddress(v.id)"
+        />
+        <q-select
+          use-input
+          input-debounce="0"
+          v-model="area"
+          :options="optionsArea"
+          label="Departamento"
+          option-label="area"
+          option-value="id"
+          class="col-md-6 col-12"
+          color="primary"
         />
       </q-form>
     </q-card-section>
@@ -33,24 +44,31 @@ export default {
   data() {
     return {
       valid: true,
+      area: "",
       address: "",
       addressRules: [(v) => !!v || "La sede es requerida"],
       optionsAddress: [],
-      optionsProjects: [],
+      optionsArea: [],
     };
   },
   methods: {
-    ...mapActions({ GetAddress: "parameters/GetAddress" }),
+    ...mapActions({
+      GetAddress: "parameters/GetAddress",
+      StorePost: "parameters/PostAxios",
+    }),
     getOptionAddress() {
       this.GetAddress().then((response) => {
         this.optionsAddress = response;
       });
     },
-    getProjects(info) {
-      /* console.log(info);
-      this.GetProjects(this.address).then((response) => {
-        this.optionsProjects = response;
-      }); */
+    getAreByAddress(id) {
+      this.StorePost({
+        context: "get_area_by_address",
+        data: { id_address: id },
+      }).then((response) => {
+        console.log(response);
+        this.optionsArea = response.data;
+      });
     },
   },
   mounted() {

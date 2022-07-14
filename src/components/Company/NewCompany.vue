@@ -23,6 +23,14 @@
           label="NIT (*)"
           data-vv-scope="formnew"
         />
+        <q-input
+          v-model="businessName"
+          class="col-md-6 col-12"
+          :rules="businessNameRules"
+          type="text"
+          label="Razón social (*)"
+          data-vv-scope="formnew"
+        />
         <q-select
           v-model="codeCiiu"
           use-input
@@ -227,11 +235,13 @@ export default {
       name: null,
       numberCel: null,
       email: null,
+      businessName: null,
       options_ciiu: stringCiiuOptions,
       options_town: stringTownOptions,
       options_type_document: [],
       //VALIDATE
       nitRules: [(v) => !!v || "El NIT es requerido."],
+      businessNameRules: [(v) => !!v || "La razón social es requerida."],
       codeCiiuRule: [(v) => !!v || "El código CIIU es requerido."],
       townRule: [(v) => !!v || "El municipio es requerido."],
       addressNameRules: [(v) => !!v || "El nombre de la sede es requerida."],
@@ -319,6 +329,7 @@ export default {
         const data = new FormData();
         data.append("logo", this.logo);
         data.append("nit", this.nit);
+        data.append("name", this.businessName);
         data.append("codeCiiu", this.codeCiiu.id);
         data.append("address", JSON.stringify(address));
         data.append("user", JSON.stringify(user));
@@ -331,7 +342,7 @@ export default {
           data: data,
           headers: headers,
         })
-          .then((response) => {
+          .then(() => {
             this.$emit("new");
           })
           .catch((e) => {

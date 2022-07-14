@@ -92,7 +92,7 @@ export default {
   },
   mounted() {
     this.permissions = this.$q.localStorage.getItem("PERMISSIONS");
-    this.filtersEvidence = true;
+    this.fliterevidence = true;
   },
 };
 </script>

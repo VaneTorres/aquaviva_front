@@ -15,7 +15,10 @@
             color="primary"
             icon="add"
             @click="fixed = true"
-          />
+            v-if="permissions.includes('Crear ficha')"
+          >
+            <q-tooltip>Nueva obligación</q-tooltip>
+          </q-btn>
           <q-space />
           <q-input
             outlined
@@ -29,7 +32,7 @@
             </template>
           </q-input>
         </template>
-        <!--  <template v-slot:body-cell-action="props">
+        <template v-slot:body-cell-action="props">
           <q-td :props="props">
             <q-btn
               color="secondary"
@@ -37,12 +40,12 @@
               no-caps
               flat
               dense
-              @click="seeval(props.row.id)"
+              @click="seeval(props.row)"
             >
               <q-tooltip> Ver detalles </q-tooltip>
             </q-btn>
           </q-td>
-        </template> -->
+        </template>
       </q-table>
       <q-dialog v-model="fixed">
         <NewObligation @new="listObligation" />
@@ -98,7 +101,6 @@ const columns = [
     field: "name",
     sortable: true,
   },
-  /*  { name: "action", label: "ACCION", field: "action", align: "center" }, */
 ];
 
 export default {
@@ -111,6 +113,7 @@ export default {
       view: false,
       fixed: false,
       data: null,
+      permissions: [],
       columns,
       rows: [],
       loading: false,
@@ -135,8 +138,17 @@ export default {
       });
     },
   },
-  mounted() {
+  created() {
+    this.permissions = this.$q.localStorage.getItem("PERMISSIONS");
     this.listObligation();
+    if (this.permissions.includes("Crear ficha")) {
+      columns[5] = {
+        name: "action",
+        label: "ACCION",
+        field: "action",
+        align: "center",
+      };
+    }
   },
 };
 </script>

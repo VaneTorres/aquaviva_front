@@ -1,7 +1,8 @@
 <template>
   <!-- Card con información de la empresa -->
-  <q-card v-if="info" style="width: 700px">
+  <q-card v-if="info != null" style="width: 700px">
     <q-card-section>
+      <q-btn icon="close" flat round dense v-close-popup class="float-right" />
       <q-splitter>
         <template v-slot:before>
           <q-tabs v-model="tab" vertical class="text-primary">
@@ -39,6 +40,14 @@
                     :rules="nitRules"
                     type="text"
                     label="NIT (*)"
+                    data-vv-scope="formnew"
+                  />
+                  <q-input
+                    v-model="info.name"
+                    class="col-md-6 col-12"
+                    :rules="businessNameRules"
+                    type="text"
+                    label="Razón social (*)"
                     data-vv-scope="formnew"
                   />
                   <q-select
@@ -236,6 +245,7 @@ export default {
       options_type_document: [],
       //VALIDATE
       nitRules: [(v) => !!v || "El NIT es requerido."],
+      businessNameRules: [(v) => !!v || "La razón social es requerida."],
       codeCiiuRule: [(v) => !!v || "El código CIIU es requerido."],
       townRule: [(v) => !!v || "El municipio es requerido."],
       addressNameRules: [(v) => !!v || "El nombre de la sede es requerida."],
@@ -334,6 +344,7 @@ export default {
       const data = new FormData();
       data.append("logo", this.info.logo);
       data.append("nit", this.info.nit);
+      data.append("name", this.info.name);
       data.append("codeCiiu", this.info.ciiu.id);
       data.append("id_company", this.info.id_company);
       this.StorePost({
@@ -398,6 +409,7 @@ export default {
       };
     });
     /* Fin consulta api de información de la compañia */
+
     /* Llenar select Ciiu */
     this.GetCiiu().then((response) => {
       stringCiiuOptions.push(response);

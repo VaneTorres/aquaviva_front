@@ -72,7 +72,7 @@
           v-for="(children, index) in treeData.children"
           :key="index"
           colspan="2"
-          class="childLevel"
+          class="childLevel infobox-item-properties"
         >
           <TreeChart :json="children" @click-node="dataOccupation = $event" />
         </td>
@@ -81,15 +81,18 @@
   </div>
   <div v-if="treeData.name == null">
     <q-btn
-      flat
+      outline
       label="Crear un nuevo cargo"
       color="primary"
       @click="newOccupation = true"
     >
     </q-btn>
+    <br />
+    <div class="text-h2 q-mt-lg">Aun no hay registro de una estructura.</div>
+    <img src="../../../public/structure.svg" class="q-mt-lg" />
   </div>
   <q-dialog v-model="newOccupation">
-    <NewEstructure @new="registerOccupation" :dataOccupation="dataOccupation" />
+    <NewEstructure :dataOccupation="dataOccupation" />
   </q-dialog>
 </template>
 
@@ -132,13 +135,9 @@ export default {
   },
   methods: {
     toggleExtend: function (treeData) {
-      console.log(treeData)
       treeData.extend = !treeData.extend;
       this.$forceUpdate();
     },
-    registerOccupation(data){
-      this.newOccupation=false;
-    }
   },
 };
 </script>

@@ -14,3 +14,6 @@ export function address_departament(state) {
 export function URL_PRODUCTION(state) {
   return state.URL_PRODUCTION;
 }
+export function URL_PUBLIC_PRODUCTION(state) {
+  return state.URL_PUBLIC_PRODUCTION;
+}

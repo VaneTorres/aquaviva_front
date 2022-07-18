@@ -51,6 +51,13 @@ export function PostAxios(state, { context, data, headers }) {
               message: response.data.message,
               type: "positive",
             });
+          } else {
+            if (response.data.code == 203) {
+              Notify.create({
+                message: response.data.error,
+                type: "negative",
+              });
+            }
           }
           return resolve(response);
         }

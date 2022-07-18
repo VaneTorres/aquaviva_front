@@ -1,7 +1,7 @@
 <template>
   <q-card style="width: 800px">
     <q-card-section class="row items-center q-pb-none">
-      <div class="text-h6">AGREGAR PROYECTO AMBIENTAL</div>
+      <div class="text-h6">EDITAR PROYECTO AMBIENTAL</div>
       <q-space />
       <q-btn icon="close" flat round dense v-close-popup />
     </q-card-section>
@@ -48,6 +48,9 @@
 import { mapActions } from "vuex";
 var stringprogramsOptions = [];
 export default {
+  props: {
+    id: Number,
+  },
   data() {
     return {
       valid: true,
@@ -68,11 +71,12 @@ export default {
     }),
     registerPrograms() {
       var data = {
+        id: this.id,
         name: this.name,
         id_program: this.programs.id,
       };
       this.StorePost({
-        context: "create_project",
+        context: "update_project",
         data: data,
       }).then(() => {
         this.$emit("editList");
@@ -94,10 +98,21 @@ export default {
       });
     },
   },
-  mounted() {
+  created() {
     this.GetProgram().then((response) => {
       stringprogramsOptions = response;
     });
+    this.StorePost({ context: "show_project", data: { id: this.id } }).then(
+      (response) => {
+        this.name = response.data.project.project;
+        this.programs = {
+          id: response.data.project.id_programs,
+          label: response.data.project.program,
+          code: response.data.project.code,
+          medium: response.data.project.medium,
+        };
+      }
+    );
   },
 };
 </script>

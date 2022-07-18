@@ -14,9 +14,11 @@
             round
             color="primary"
             icon="add"
-            @click="fixed = true"
+            @click="newProgram = true"
             v-if="permissions.includes('Crear programa')"
-          />
+          >
+            <q-tooltip>Nuevo programa ambiental</q-tooltip>
+          </q-btn>
           <q-space />
           <q-input
             outlined
@@ -30,9 +32,38 @@
             </template>
           </q-input>
         </template>
+        <template v-slot:body-cell-action="props">
+          <q-td :props="props">
+            <q-btn
+              color="primary"
+              icon-right="mdi-pencil-outline"
+              no-caps
+              flat
+              dense
+              @click="action(props.row.id, 'edit')"
+              v-if="permissions.includes('Actualizar programa')"
+            >
+              <q-tooltip>Editar</q-tooltip>
+            </q-btn>
+            <q-btn
+              color="negative"
+              icon-right="mdi-delete-outline"
+              no-caps
+              flat
+              dense
+              @click="action(props.row.id, 'delete')"
+              v-if="permissions.includes('Eliminar programa')"
+            >
+              <q-tooltip>Eliminar</q-tooltip>
+            </q-btn>
+          </q-td>
+        </template>
       </q-table>
-      <q-dialog v-model="fixed">
-        <NewProgram @new="registerPrograms" />
+      <q-dialog v-model="newProgram">
+        <NewProgram @editList="registerPrograms" />
+      </q-dialog>
+      <q-dialog v-model="editProgram">
+        <EditProgram :id="id_program" @editList="registerPrograms" />
       </q-dialog>
     </div>
   </q-page>
@@ -41,6 +72,7 @@
 <script>
 /* Componentes de ver y nuevo */
 import NewProgram from "src/components/parameterize/NewProgram.vue";
+import EditProgram from "src/components/parameterize/EditProgram.vue";
 import { mapActions } from "vuex";
 /* Columnas de las tablas */
 const columns = [
@@ -56,7 +88,7 @@ const columns = [
   {
     name: "code",
     align: "center",
-    label: "CODIGO",
+    label: "CÓDIGO",
     field: "code",
     sortable: true,
   },
@@ -74,10 +106,13 @@ const originalRows = [];
 export default {
   components: {
     NewProgram,
+    EditProgram,
   },
   data() {
     return {
-      fixed: false,
+      id_program: null,
+      newProgram: false,
+      editProgram: false,
       permissions: [],
       columns,
       rows: originalRows,
@@ -89,9 +124,24 @@ export default {
   methods: {
     ...mapActions({
       GetProgram: "parameters/GetProgram",
+      StorePost: "parameters/PostAxios",
     }),
+    action(id, action) {
+      if (action === "delete") {
+        this.StorePost({
+          context: `delete_program`,
+          data: { id_program: id },
+        }).then((response) => {
+          this.listPrograms();
+        });
+      } else if (action === "edit") {
+        this.id_program = id;
+        this.editProgram = true;
+      }
+    },
     registerPrograms() {
-      this.fixed = false;
+      this.newProgram = false;
+      this.editProgram = false;
       this.listPrograms();
     },
     listPrograms() {
@@ -103,9 +153,20 @@ export default {
       });
     },
   },
-  mounted() {
+  created() {
     this.permissions = this.$q.localStorage.getItem("PERMISSIONS");
     this.listPrograms();
+    if (
+      this.permissions.includes("Actualizar programa") ||
+      this.permissions.includes("Eliminar programa")
+    ) {
+      columns[3] = {
+        name: "action",
+        label: "ACCION",
+        field: "action",
+        align: "center",
+      };
+    }
   },
 };
 </script>

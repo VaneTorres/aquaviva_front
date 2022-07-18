@@ -5,7 +5,7 @@
       <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
         <q-card flat bordered class>
           <q-card-section>
-            <div class="text-h6">Información de la compañia</div>
+            <div class="text-h6">Información de la compañía</div>
           </q-card-section>
           <q-separator inset></q-separator>
           <q-card-section>
@@ -16,11 +16,19 @@
                     :ratio="16 / 9"
                     :src="
                       data.logo != null
-                        ? 'http://localhost:8000/img/companies/' + data.logo
-                        : 'http://localhost:8000/img/companies/sin_logo.png'
+                        ? url + '/img/companies/' + data.logo
+                        : url + '/img/companies/sin_logo.png'
                     "
                     fit="contain"
                   ></q-img>
+                </q-item-section>
+              </q-item>
+              <q-item>
+                <q-item-section>
+                  <q-item-label class="q-pb-xs"
+                    ><div class="text-subtitle2">Razón social:</div>
+                    {{ data.name }}</q-item-label
+                  >
                 </q-item-section>
               </q-item>
               <q-item>
@@ -34,7 +42,7 @@
               <q-item>
                 <q-item-section>
                   <q-item-label class="q-pb-xs"
-                    ><div class="text-subtitle2">Codigo ciiu:</div>
+                    ><div class="text-subtitle2">Código ciiu:</div>
                     {{ data.ciiu }}</q-item-label
                   >
                 </q-item-section>
@@ -66,7 +74,9 @@
                   icon="add"
                   @click="newaddress = true"
                   v-if="permissions.includes('Crear sede')"
-                />
+                >
+                  <q-tooltip>Nueva sede </q-tooltip>
+                </q-btn>
               </div>
             </div>
           </q-card-section>
@@ -160,6 +170,7 @@ export default {
       loading: false,
       columns,
       id_company: null,
+      url: null,
       permissions: [],
       data: {
         ciiu: null,
@@ -187,6 +198,7 @@ export default {
         this.loading = false;
         this.id_company = response.data.company.id_company;
         this.data = {
+          name: response.data.company.name,
           ciiu: response.data.company.ciiu,
           ciiu_description: response.data.company.ciiu_description,
           nit: response.data.company.nit,
@@ -207,6 +219,7 @@ export default {
     },
   },
   mounted() {
+    this.url = this.$store.getters["parameters/URL_PUBLIC_PRODUCTION"];
     this.permissions = this.$q.localStorage.getItem("PERMISSIONS");
     this.dataCompany();
   },

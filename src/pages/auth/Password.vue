@@ -114,7 +114,7 @@ export default defineComponent({
         spinnerColor: "black",
         spinnerSize: 140,
         backgroundColor: "green",
-        message: "Estamos validando sus credenciales",
+        message: "",
         messageColor: "black",
       });
       var token = this.$route.params.token;

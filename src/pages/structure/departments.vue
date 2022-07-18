@@ -15,7 +15,10 @@
             color="primary"
             icon="add"
             @click="newDepartments = true"
-          />
+            v-if="permissions.includes('Crear área')"
+          >
+            <q-tooltip>Nuevo departamento </q-tooltip>
+          </q-btn>
           <q-space />
           <q-input
             outlined
@@ -31,23 +34,14 @@
         </template>
         <template v-slot:body-cell-action="props">
           <q-td :props="props">
-            <!-- <q-btn
-              color="secondary"
-              icon-right="mdi-book-open-page-variant-outline"
-              no-caps
-              flat
-              dense
-              @click="seeval(props.row.id, props.row.id_address)"
-            >
-              <q-tooltip>Ver tareas </q-tooltip>
-            </q-btn> -->
             <q-btn
               color="secondary"
               icon-right="mdi-lan"
               no-caps
               flat
               dense
-              @click="seeval(props.row.id, props.row.id_address)"
+              @click="seeval(props.row.id_area, props.row.id_address)"
+              v-if="permissions.includes('Ver estructura')"
             >
               <q-tooltip>Ver estructura organizacional</q-tooltip>
             </q-btn>
@@ -62,7 +56,7 @@
 </template>
 
 <script>
-import newDepartments from "src/components/newDepartments.vue";
+import newDepartments from "src/components/Estructure/newDepartments.vue";
 import { mapActions } from "vuex";
 const columns = [
   {
@@ -81,7 +75,6 @@ const columns = [
     field: "name_address",
     sortable: true,
   },
-  { name: "action", label: "ACCIÓN", field: "action", align: "center" },
 ];
 
 const originalRows = [];
@@ -92,6 +85,7 @@ export default {
   },
   data() {
     return {
+      permissions: [],
       newDepartments: false,
       columns,
       rows: originalRows,
@@ -121,15 +115,24 @@ export default {
       /*Treaer los departamentos*/
       this.GetAxios({ context: "get_areas" })
         .then((response) => {
-          this.rows = response.data;
+          this.rows = response.data.areas;
         })
         .catch((e) => {
           console.log(e);
         });
     },
   },
-  mounted() {
+  created() {
+    this.permissions = this.$q.localStorage.getItem("PERMISSIONS");
     this.departaments();
+    if (this.permissions.includes("Ver estructura")) {
+      columns[2] = {
+        name: "action",
+        label: "ACCION",
+        field: "action",
+        align: "center",
+      };
+    }
   },
 };
 </script>

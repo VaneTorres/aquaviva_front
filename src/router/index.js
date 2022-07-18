@@ -44,6 +44,12 @@ export default route(function ({ store } /* { store, ssrContext } */) {
     } else {
       next();
     }
+    if (
+      to.matched.some((route) => route.meta.loginAuth) &&
+      store.getters["parameters/authenticated"]
+    ) {
+      window.location = "/admin/dashboard";
+    }
   });
   return Router;
 });

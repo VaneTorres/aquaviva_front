@@ -16,7 +16,10 @@
             color="primary"
             icon="add"
             @click="newCompany = true"
-          />
+            v-if="permissions.includes('Crear empresa')"
+          >
+            <q-tooltip>Nueva compañia </q-tooltip>
+          </q-btn>
           <q-space />
           <q-input
             outlined
@@ -39,14 +42,16 @@
               flat
               dense
               @click="modalCompany(props.row.id_company, 'view')"
+              v-if="permissions.includes('Ver empresa')"
             >
               <q-tooltip>Ver detalles </q-tooltip>
             </q-btn>
             <q-btn
-              color="info"
+              color="primary"
               icon-right="mdi-pencil-outline"
               no-caps
               flat
+              v-if="permissions.includes('Editar empresa')"
               dense
               @click="modalCompany(props.row.id_company, 'edit')"
             >
@@ -94,6 +99,13 @@ const columns = [
     sortable: true,
   },
   {
+    name: "name",
+    align: "center",
+    label: "RAZÓN SOCIAL ",
+    field: "name",
+    sortable: true,
+  },
+  {
     name: "ciiu",
     align: "center",
     label: "CÓDIGO CIIU ",
@@ -109,7 +121,6 @@ const columns = [
     field: "description",
     sortable: true,
   },
-  { name: "action", label: "ACCIÓN", field: "action", align: "center" },
 ];
 
 export default {
@@ -127,6 +138,7 @@ export default {
       view: false,
       edit: false,
       id_company: null,
+      permissions: [],
       columns,
       rows: [],
       loading: false,
@@ -163,7 +175,19 @@ export default {
     },
   },
   created() {
+    this.permissions = this.$q.localStorage.getItem("PERMISSIONS");
     this.listCompany();
+    if (
+      this.permissions.includes("Ver empresa") ||
+      this.permissions.includes("Editar empresa")
+    ) {
+      columns[4] = {
+        name: "action",
+        label: "ACCION",
+        field: "action",
+        align: "center",
+      };
+    }
   },
 };
 </script>

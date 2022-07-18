@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import TreeChart from "src/components/Estructure/TreeChart";
 export default {
   name: "app",
@@ -27,6 +28,9 @@ export default {
     };
   },
   methods: {
+    ...mapActions({
+      StorePost: "parameters/PostAxios",
+    }),
     childrenFine(jsonData, val) {
       if (Array.isArray(jsonData.children)) {
         jsonData.children.forEach((c) => {
@@ -99,17 +103,14 @@ export default {
   },
   mounted() {
     const data = { id_area: this.$store.getters["parameters/departament"] };
-    this.$axios
-      .post("http://127.0.0.1:8000/api/get_structure", data)
-      .then((response) => {
+    this.StorePost({ context: "get_structure", data: data }).then(
+      (response) => {
         this.datatree.children = [];
         response.data.forEach((element) => {
           this.insert(element);
         });
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+      }
+    );
   },
 };
 class Tree {

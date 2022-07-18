@@ -2,7 +2,7 @@
   <!-- Card con información de la empresa -->
   <q-card v-if="info != null">
     <q-card-section class="row items-center q-pb-none">
-      <div class="text-h6">NIT: {{ info.nit }}</div>
+      <div class="text-h6">Razón social: {{ info.name }}</div>
       <q-space />
       <q-btn icon="close" flat round dense v-close-popup />
     </q-card-section>
@@ -13,14 +13,16 @@
             :ratio="16 / 9"
             :src="
               info.logo != null
-                ? 'http://localhost:8000/img/companies/' + info.logo
-                : 'http://localhost:8000/img/companies/sin_logo.png'
+                ? url + '/img/companies/' + info.logo
+                : url + '/img/companies/sin_logo.png'
             "
             fit="contain"
           ></q-img>
         </div>
         <div class="col-md-6 col-12">
-          <div class="text-subtitle2">Código de Ciiu:</div>
+          <div class="text-subtitle2">Nit:</div>
+          {{ info.nit }}
+          <div class="text-subtitle2 q-mt-md">Código de Ciiu:</div>
           {{ info.ciiu }}
           <div class="text-subtitle2 q-mt-md">Descripción de Ciiu:</div>
           {{ info.ciiu_description }}
@@ -117,6 +119,7 @@ export default {
     return {
       columns,
       rows: [],
+      url: null,
       info: null,
     };
   },
@@ -130,6 +133,7 @@ export default {
     }),
   },
   mounted() {
+    this.url = this.$store.getters["parameters/URL_PUBLIC_PRODUCTION"];
     /* Consulta api de información de la compañia */
     this.StorePost({
       context: "company_show",

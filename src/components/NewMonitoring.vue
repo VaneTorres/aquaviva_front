@@ -1,5 +1,5 @@
 <template>
-  <q-card>
+  <q-card style="max-width: 700px">
     <q-card-section class="row items-center q-pb-none">
       <div class="text-h6">AGREGAR PROYECTO DE LA ORGANIZACIÓN</div>
       <q-space />
@@ -21,7 +21,7 @@
             @filter="filterAddress"
             v-model="address"
             :options="options_address"
-            label="Sede *"
+            label="Sede (*)"
             class="col-md-6 col-12"
             color="primary"
           />
@@ -30,7 +30,7 @@
             :rules="projectNameRules"
             type="text"
             class="col-md-6 col-12"
-            label="Proyecto de la organización*"
+            label="Proyecto de la organización (*)"
           />
           <q-select
             use-input
@@ -39,7 +39,7 @@
             @filter="filterTown"
             v-model="town"
             :options="options_town"
-            label="Municipio *"
+            label="Municipio (*)"
             class="col-md-6 col-12"
             color="primary"
           />
@@ -48,7 +48,7 @@
             :rules="ubicationNameRules"
             type="text"
             class="col-md-6 col-12"
-            label="Ubicación *"
+            label="Ubicación (*)"
           />
           <q-select
             use-input
@@ -57,14 +57,21 @@
             @filter="filterAuthority"
             v-model="authority"
             :options="options_authority"
-            label="Autoridad ambiental *"
+            label="Autoridad ambiental (*)"
             class="col-md-6 col-12"
             color="primary"
           />
+          <div class="col-md-12">
+            <q-separator />
+            <div class="text-subtitle1 text-center">
+              Obligaciones Ambientales
+            </div>
+            <q-separator />
+          </div>
           <div class="row">
             <q-checkbox
               :rules="toolRule"
-              class="col-md-6 col-12"
+              class="col-md-6 col-12 text-left"
               v-for="(item, index) in options_tools"
               :key="index"
               v-model="tool"
@@ -125,9 +132,7 @@ export default {
       StorePost: "parameters/PostAxios",
     }),
     registerEnviorenmentalMonitore() {
-      var id_user = this.$q.localStorage.getItem("USER");
       var data = {
-        id_user: id_user,
         project: this.project,
         id_town: this.town.id,
         especification: this.ubication,

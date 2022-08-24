@@ -19,6 +19,25 @@
                 <q-icon name="attach_file" />
               </template>
             </q-file>
+            <!-- select to select to folden destinded to upload a file -->
+            <q-select
+              class="q-my-md"
+              v-model="selected"
+              :options="options"
+              label="Seleccionar"
+              dense
+              color="primary"
+              style="max-width: 300px"
+              @update:model-value="(val) => updateSelected(val)"
+            />
+            <q-btn
+              color="primary"
+              icon-right="mdi-plus"
+              no-caps
+              flat
+              dense
+              @click="sendFilesToServer()"
+            />
           </template>
         </q-tree>
       </div>
@@ -30,7 +49,31 @@ import { mapActions } from "vuex";
 export default {
   data() {
     return {
-      file: null,
+      selected: "",
+      options: [
+        {
+          label: "Anexo1.Reg_Fotografico",
+          value: "Anexo1.Reg_Fotografico",
+        },
+        {
+          label: "Anexo2.GDB",
+          value: "Anexo2.GDB",
+        },
+        {
+          label: "Anexo3.Rep_Laboratorio",
+          value: "Anexo3.Rep_Laboratorio",
+        },
+        {
+          label: "Anexo4.Gestion_Ambiental_Social",
+          value: "Anexo4.Gestion_Ambiental_Social",
+        },
+        {
+          label: "Anexo5.Gestion_Legal",
+          value: "Anexo5.Gestion_Legal",
+        },
+      ],
+      file: "",
+      obligation: "",
       expanded: ["Cap_7_Anexos"],
       simple: [
         {
@@ -61,7 +104,7 @@ export default {
           label: "Cap_7_Anexos",
           icon: "folder",
           body: "toggle",
-          children: [
+          /* children: [
             {
               label: "Anexo1.Reg_Fotografico",
               icon: "folder",
@@ -88,12 +131,15 @@ export default {
                 },
               ],
             },
-          ],
+          ], */
         },
       ],
     };
   },
   methods: {
+    ...mapActions({
+      StorePost: "parameters/PostAxios",
+    }),
     ...mapActions({ GetAddress: "parameters/GetAddress" }),
     getOptionAddress() {
       this.GetAddress().then((response) => {
@@ -104,6 +150,26 @@ export default {
       /* this.GetProjects(this.address).then((response) => {
             this.optionsProjects = response;
         }); */
+    },
+
+    sendFilesToServer() {
+      const formData = new FormData();
+      const id = sessionStorage.getItem("id");
+      const selected = this.selected;
+      console.log(selected);
+      formData.append("selected", selected);
+      formData.append("id_tool", id);
+      formData.append("file", this.file);
+      console.log(formData);
+      this.StorePost({
+        context: "upload_files_tools",
+        data: formData,
+      }).then((response) => {
+        console.log(response);
+      });
+    },
+    updateSelected(val) {
+      this.selected = JSON.parse(JSON.stringify(val.value));
     },
   },
   mounted() {

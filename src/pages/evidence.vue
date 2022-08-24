@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-pa-md">
     <q-table
-      :rows="rows"
+      :rows="obligations"
       :columns="columns"
       row-key="id"
       :filter="filter"
@@ -31,7 +31,7 @@
       </template>
     </q-table>
     <q-dialog v-model="fliterevidence">
-      <filtersEvidence />
+      <filtersEvidence @obligations="setObligations" />
     </q-dialog>
     <q-dialog v-model="evidence">
       <evidence />
@@ -48,7 +48,7 @@ const columns = [
     required: true,
     label: "OBLIGACIÓN",
     align: "center",
-    field: (row) => row.oblig,
+    field: (row) => row.tool,
     format: (val) => `${val}`,
     sortable: true,
   },
@@ -61,20 +61,21 @@ const columns = [
   },
 ];
 
-const originalRows = [
+/* const originalRows = [
   {
     oblig:
       "ESTADO DE CUMPLIMIENTO DE LOS PROGRAMAS DEL AEROPUERTO INTERNACIONAL ALFREDO VÁSQUEZ COBO PERIODO 2018",
   },
 ];
-
+ */
 export default {
   data() {
     return {
       fliterevidence: false,
       evidence: false,
       columns,
-      rows: originalRows,
+      obligations: [],
+      //rows: originalRows,
       loading: false,
       filter: "",
       rowCount: 15,
@@ -88,6 +89,11 @@ export default {
   methods: {
     seeval(id) {
       this.evidence = true;
+      sessionStorage.setItem("id", id);
+    },
+    setObligations(obligations) {
+      this.obligations = obligations;
+      console.log(this.obligations);
     },
   },
   mounted() {

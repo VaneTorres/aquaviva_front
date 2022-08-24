@@ -21,18 +21,7 @@
           label="Sede"
           class="col-md-6 col-12"
           color="primary"
-          @update:model-value="(v) => getAreByAddress(v.id)"
-        />
-        <q-select
-          use-input
-          input-debounce="0"
-          v-model="area"
-          :options="optionsArea"
-          label="Departamento"
-          option-label="area"
-          option-value="id"
-          class="col-md-6 col-12"
-          color="primary"
+          @update:model-value="(v) => getMonitoringsToolsByAddress(v.id)"
         />
       </q-form>
     </q-card-section>
@@ -44,12 +33,16 @@ export default {
   data() {
     return {
       valid: true,
+      id_address: null,
       area: "",
       address: "",
       addressRules: [(v) => !!v || "La sede es requerida"],
       optionsAddress: [],
-      optionsArea: [],
+      monitoringsTools: [],
     };
+  },
+  props: {
+    tools: Object,
   },
   methods: {
     ...mapActions({
@@ -61,13 +54,14 @@ export default {
         this.optionsAddress = response;
       });
     },
-    getAreByAddress(id) {
+    getMonitoringsToolsByAddress(id) {
       this.StorePost({
-        context: "get_area_by_address",
-        data: { id_address: id },
+        context: "get_monitoring_tools_by_address",
+        data: {
+          id,
+        },
       }).then((response) => {
-        console.log(response);
-        this.optionsArea = response.data;
+        this.$emit("obligations", response.data);
       });
     },
   },

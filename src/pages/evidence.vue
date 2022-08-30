@@ -40,8 +40,8 @@
 </template>
 
 <script>
-import filtersEvidence from "src/components/filtersEvidence.vue";
-import evidence from "src/components/evidence.vue";
+import filtersEvidence from "src/components/Evidence/filtersEvidence.vue";
+import evidence from "src/components/Evidence/evidence.vue";
 const columns = [
   {
     name: "obligation",
@@ -75,6 +75,7 @@ export default {
       evidence: false,
       columns,
       obligations: [],
+
       //rows: originalRows,
       loading: false,
       filter: "",
@@ -93,7 +94,6 @@ export default {
     },
     setObligations(obligations) {
       this.obligations = obligations;
-      console.log(this.obligations);
     },
   },
   mounted() {

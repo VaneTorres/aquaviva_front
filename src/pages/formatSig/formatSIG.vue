@@ -177,6 +177,13 @@ export default {
     },
 
     downloadFormat(link) {
+      this.StorePost({ context: "download_files", data: { excel: link } })
+        .then((response) => {
+          window.open("http://127.0.0.1:8000/" + response.data, "_blank");
+        })
+        .catch((e) => {
+          console.log(e);
+        });
       /* S3.config.update({
         region: "us-east-1",
         accessKeyId: "AKIAQVBD44LUO5575MOL",
@@ -199,16 +206,16 @@ export default {
           window.open(url);
         }
       }); */
-      const s3Client = new S3({
+      /*    const s3Client = new S3({
         endpoint: "http://s3.amazonaws.com/aquaviva/",
         region: "us-east-2",
         credentials: {
           accessKeyId: "AKIAQVBD44LUO5575MOL",
           secretAccessKey: "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",
         },
-      });
+      }); */
       /* const s3Client = new S3(); */
-      s3Client.getObject({
+      /*   s3Client.getObject({
         Bucket: "aquaviva",
         disk: "s3",
         Key: "excel/" + link + ".xlsx",
@@ -221,7 +228,7 @@ export default {
             alert("Loaded " + data.ContentLength + " bytes");
           }
         },
-      });
+      }); */
     },
     action(id, action) {
       if (action == "upload") {

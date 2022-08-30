@@ -6,6 +6,11 @@
     </q-card-section>
     <q-card-section>
       <div class="q-pa-md q-gutter-sm">
+        <p>
+          Seleccione aquí la subcarpeta de Anexos donde desea que quede
+          almacenado el archivo, el cual será enumerado automática y
+          secuencialmente.
+        </p>
         <q-tree
           :nodes="simple"
           dense
